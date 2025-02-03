@@ -28,19 +28,23 @@
     const canvas = document.getElementById('orbitCanvas');
     const ctx = canvas.getContext('2d');
 
-    const SUN_RADIUS = 30;
+    const SUN_RADIUS = 30; // Size of the sun at the center
     const CENTER_X = canvas.width / 2;
     const CENTER_Y = canvas.height / 2;
 
-    // Define planets with detailed properties
+    // Define planets with detailed properties, including distance, size, speed, and color
     const planets = [
       { name: 'Mercury', distance: 60, size: 5, speed: 0.04, color: 'gray' },
       { name: 'Venus', distance: 100, size: 8, speed: 0.03, color: 'orange' },
       { name: 'Earth', distance: 150, size: 9, speed: 0.02, color: 'blue' },
       { name: 'Mars', distance: 200, size: 7, speed: 0.015, color: 'red' },
-      { name: 'Jupiter', distance: 300, size: 15, speed: 0.008, color: 'brown' }
+      { name: 'Jupiter', distance: 300, size: 15, speed: 0.008, color: 'brown' },
+      { name: 'Saturn', distance: 400, size: 12, speed: 0.006, color: 'goldenrod' },
+      { name: 'Uranus', distance: 500, size: 10, speed: 0.004, color: 'lightblue' },
+      { name: 'Neptune', distance: 600, size: 10, speed: 0.003, color: 'darkblue' }
     ];
 
+    // Initialize random angles for each planet's starting position
     let angleOffsets = planets.map(() => Math.random() * Math.PI * 2);
 
     // Draw the Sun at the center
@@ -52,19 +56,19 @@
       ctx.closePath();
     }
 
-    // Draw planet at a given angle and position
+    // Draw a planet at a given angle and position
     function drawPlanet(planet, angle) {
-      const x = CENTER_X + planet.distance * Math.cos(angle);
-      const y = CENTER_Y + planet.distance * Math.sin(angle);
+      const x = CENTER_X + planet.distance * Math.cos(angle); // X-coordinate of the planet
+      const y = CENTER_Y + planet.distance * Math.sin(angle); // Y-coordinate of the planet
 
-      // Draw planet
+      // Draw the planet circle
       ctx.beginPath();
       ctx.arc(x, y, planet.size, 0, Math.PI * 2);
       ctx.fillStyle = planet.color;
       ctx.fill();
       ctx.closePath();
 
-      // Label the planet
+      // Label the planet with its name
       ctx.fillStyle = 'white';
       ctx.font = '12px Arial';
       ctx.fillText(planet.name, x + 10, y);
@@ -74,31 +78,32 @@
     function drawOrbit(distance) {
       ctx.beginPath();
       ctx.arc(CENTER_X, CENTER_Y, distance, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; // Light transparent color for orbits
       ctx.stroke();
       ctx.closePath();
     }
 
     // Update and animate the scene
     function update() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas for redrawing
 
-      // Draw Sun
+      // Draw the Sun
       drawSun();
 
-      // Draw planets and their orbits
+      // Draw each planet and its orbit
       planets.forEach((planet, index) => {
-        drawOrbit(planet.distance);
-        drawPlanet(planet, angleOffsets[index]);
+        drawOrbit(planet.distance); // Draw the orbit circle
+        drawPlanet(planet, angleOffsets[index]); // Draw the planet at the current angle
 
-        // Update planet angle for animation
+        // Update the planet's angle to simulate motion
         angleOffsets[index] += planet.speed;
       });
 
-      requestAnimationFrame(update);
+      requestAnimationFrame(update); // Keep the animation running
     }
 
-    update();
+    update(); // Start the animation
   </script>
 </body>
 </html>
+
