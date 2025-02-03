@@ -32,19 +32,35 @@
     const CENTER_X = canvas.width / 2;
     const CENTER_Y = canvas.height / 2;
 
-    // Define planets with slowed down orbital speeds and removed rings for Saturn
+    // Define planets with slowed down orbital speeds and textures
     const planets = [
-      { name: 'Mercury', distance: 50, size: 3, speed: 0.01, color: '#b2b2b2' },
-      { name: 'Venus', distance: 80, size: 7, speed: 0.008, color: '#f4a460' },
-      { name: 'Earth', distance: 110, size: 8, speed: 0.006, color: '#1e90ff' },
-      { name: 'Mars', distance: 150, size: 6, speed: 0.005, color: '#ff4500' },
-      { name: 'Jupiter', distance: 220, size: 14, speed: 0.004, color: '#d2b48c' },
-      { name: 'Saturn', distance: 300, size: 12, speed: 0.003, color: '#f0e68c' },
-      { name: 'Uranus', distance: 370, size: 10, speed: 0.002, color: '#87ceeb' },
-      { name: 'Neptune', distance: 440, size: 10, speed: 0.0015, color: '#4682b4' }
+      { name: 'Mercury', distance: 50, size: 3, speed: 0.01, color: '#b2b2b2', texture: 'textures/mercury.jpg' },
+      { name: 'Venus', distance: 80, size: 7, speed: 0.008, color: '#f4a460', texture: 'textures/venus.jpg' },
+      { name: 'Earth', distance: 110, size: 8, speed: 0.006, color: '#1e90ff', texture: 'textures/earth.jpg' },
+      { name: 'Mars', distance: 150, size: 6, speed: 0.005, color: '#ff4500', texture: 'textures/mars.jpg' },
+      { name: 'Jupiter', distance: 220, size: 14, speed: 0.004, color: '#d2b48c', texture: 'textures/jupiter.jpg' },
+      { name: 'Saturn', distance: 300, size: 12, speed: 0.003, color: '#f0e68c', texture: 'textures/saturn.jpg', rings: true },
+      { name: 'Uranus', distance: 370, size: 10, speed: 0.002, color: '#87ceeb', texture: 'textures/uranus.jpg' },
+      { name: 'Neptune', distance: 440, size: 10, speed: 0.0015, color: '#4682b4', texture: 'textures/neptune.jpg' }
     ];
 
     let angleOffsets = planets.map(() => Math.random() * Math.PI * 2);
+    
+    // Load all the planet textures
+    const planetTextures = {};
+    const texturesLoaded = planets.map(planet => {
+      const img = new Image();
+      img.src = planet.texture;
+      planetTextures[planet.name] = img;
+      return new Promise((resolve) => {
+        img.onload = resolve;
+      });
+    });
+
+    // Load all textures first
+    Promise.all(texturesLoaded).then(() => {
+      update();
+    });
 
     function drawSun() {
       const gradient = ctx.createRadialGradient(CENTER_X, CENTER_Y, 0, CENTER_X, CENTER_Y, SUN_RADIUS);
@@ -62,20 +78,51 @@
       const x = CENTER_X + planet.distance * Math.cos(angle);
       const y = CENTER_Y + planet.distance * Math.sin(angle);
 
-      // Create a gradient for the planet's surface
-      const planetGradient = ctx.createRadialGradient(x, y, 0, x, y, planet.size);
-      planetGradient.addColorStop(0, planet.color);
-      planetGradient.addColorStop(1, 'black'); // Shadow effect
+      // If the planet has a texture, use the image texture
+      if (planetTextures[planet.name]) {
+        ctx.drawImage(planetTextures[planet.name], x - planet.size, y - planet.size, planet.size * 2, planet.size * 2);
+      } else {
+        // Fallback to gradient if no texture
+        const planetGradient = ctx.createRadialGradient(x, y, 0, x, y, planet.size);
+        planetGradient.addColorStop(0, planet.color);
+        planetGradient.addColorStop(1, 'black'); // Shadow effect
 
-      ctx.beginPath();
-      ctx.arc(x, y, planet.size, 0, Math.PI * 2);
-      ctx.fillStyle = planetGradient;
-      ctx.fill();
-      ctx.closePath();
+        ctx.beginPath();
+        ctx.arc(x, y, planet.size, 0, Math.PI * 2);
+        ctx.fillStyle = planetGradient;
+        ctx.fill();
+        ctx.closePath();
+      }
 
       ctx.fillStyle = 'white';
       ctx.font = '10px Arial';
       ctx.fillText(planet.name, x + 10, y);
+
+      // If the planet has rings (only Saturn), draw them
+      if (planet.rings) {
+        drawSaturnRings(x, y, planet.distance);
+      }
+    }
+
+    function drawSaturnRings(x, y, distance) {
+      const ringRadius = distance + 20; // Size of the rings
+      const ringWidth = 6; // Width of the rings
+
+      // Outer ring
+      ctx.beginPath();
+      ctx.ellipse(x, y, ringRadius, ringRadius / 3, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = ringWidth;
+      ctx.stroke();
+      ctx.closePath();
+
+      // Inner ring (more transparent)
+      ctx.beginPath();
+      ctx.ellipse(x, y, ringRadius - 6, (ringRadius - 6) / 3, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.lineWidth = ringWidth;
+      ctx.stroke();
+      ctx.closePath();
     }
 
     function drawOrbit(distance) {
@@ -99,8 +146,6 @@
 
       requestAnimationFrame(update);
     }
-
-    update();
   </script>
 </body>
 </html>
