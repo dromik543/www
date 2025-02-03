@@ -32,16 +32,16 @@
     const CENTER_X = canvas.width / 2;
     const CENTER_Y = canvas.height / 2;
 
-    // Define planets with detailed properties
+    // Define planets with slowed down orbital speeds and removed rings for Saturn
     const planets = [
-      { name: 'Mercury', distance: 50, size: 3, speed: 0.04, color: '#b2b2b2', rings: false },
-      { name: 'Venus', distance: 80, size: 7, speed: 0.03, color: '#f4a460', rings: false },
-      { name: 'Earth', distance: 110, size: 8, speed: 0.02, color: '#1e90ff', rings: false },
-      { name: 'Mars', distance: 150, size: 6, speed: 0.015, color: '#ff4500', rings: false },
-      { name: 'Jupiter', distance: 220, size: 14, speed: 0.008, color: '#d2b48c', rings: false },
-      { name: 'Saturn', distance: 300, size: 12, speed: 0.006, color: '#f0e68c', rings: true },
-      { name: 'Uranus', distance: 370, size: 10, speed: 0.004, color: '#87ceeb', rings: false },
-      { name: 'Neptune', distance: 440, size: 10, speed: 0.003, color: '#4682b4', rings: false }
+      { name: 'Mercury', distance: 50, size: 3, speed: 0.01, color: '#b2b2b2' },
+      { name: 'Venus', distance: 80, size: 7, speed: 0.008, color: '#f4a460' },
+      { name: 'Earth', distance: 110, size: 8, speed: 0.006, color: '#1e90ff' },
+      { name: 'Mars', distance: 150, size: 6, speed: 0.005, color: '#ff4500' },
+      { name: 'Jupiter', distance: 220, size: 14, speed: 0.004, color: '#d2b48c' },
+      { name: 'Saturn', distance: 300, size: 12, speed: 0.003, color: '#f0e68c' },
+      { name: 'Uranus', distance: 370, size: 10, speed: 0.002, color: '#87ceeb' },
+      { name: 'Neptune', distance: 440, size: 10, speed: 0.0015, color: '#4682b4' }
     ];
 
     let angleOffsets = planets.map(() => Math.random() * Math.PI * 2);
@@ -76,21 +76,6 @@
       ctx.fillStyle = 'white';
       ctx.font = '10px Arial';
       ctx.fillText(planet.name, x + 10, y);
-      
-      // If the planet has rings, draw them
-      if (planet.rings) {
-        drawRings(x, y, planet.distance);
-      }
-    }
-
-    function drawRings(x, y, distance) {
-      const ringRadius = distance + 15; // Size of the rings
-      ctx.beginPath();
-      ctx.ellipse(x, y, ringRadius, ringRadius / 3, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.closePath();
     }
 
     function drawOrbit(distance) {
