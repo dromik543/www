@@ -32,16 +32,16 @@
     const CENTER_X = canvas.width / 2;
     const CENTER_Y = canvas.height / 2;
 
-    // Define planets with slowed down orbital speeds and textures (placeholders)
+    // Define planets with realistic textures and slower speeds
     const planets = [
-      { name: 'Mercury', distance: 50, size: 3, speed: 0.01, color: '#b2b2b2', texture: 'https://example.com/mercury.jpg' },
-      { name: 'Venus', distance: 80, size: 7, speed: 0.008, color: '#f4a460', texture: 'https://example.com/venus.jpg' },
-      { name: 'Earth', distance: 110, size: 8, speed: 0.006, color: '#1e90ff', texture: 'https://example.com/earth.jpg' },
-      { name: 'Mars', distance: 150, size: 6, speed: 0.005, color: '#ff4500', texture: 'https://example.com/mars.jpg' },
-      { name: 'Jupiter', distance: 220, size: 14, speed: 0.004, color: '#d2b48c', texture: 'https://example.com/jupiter.jpg' },
-      { name: 'Saturn', distance: 300, size: 12, speed: 0.003, color: '#f0e68c', texture: 'https://example.com/saturn.jpg', rings: true },
-      { name: 'Uranus', distance: 370, size: 10, speed: 0.002, color: '#87ceeb', texture: 'https://example.com/uranus.jpg' },
-      { name: 'Neptune', distance: 440, size: 10, speed: 0.0015, color: '#4682b4', texture: 'https://example.com/neptune.jpg' }
+      { name: 'Mercury', distance: 50, size: 3, speed: 0.008, color: '#b2b2b2', texture: 'https://example.com/mercury_texture.jpg' },
+      { name: 'Venus', distance: 80, size: 7, speed: 0.006, color: '#f4a460', texture: 'https://example.com/venus_texture.jpg' },
+      { name: 'Earth', distance: 110, size: 8, speed: 0.005, color: '#1e90ff', texture: 'https://example.com/earth_texture.jpg' },
+      { name: 'Mars', distance: 150, size: 6, speed: 0.004, color: '#ff4500', texture: 'https://example.com/mars_texture.jpg' },
+      { name: 'Jupiter', distance: 220, size: 14, speed: 0.003, color: '#d2b48c', texture: 'https://example.com/jupiter_texture.jpg' },
+      { name: 'Saturn', distance: 300, size: 12, speed: 0.002, color: '#f0e68c', texture: 'https://example.com/saturn_texture.jpg', rings: true },
+      { name: 'Uranus', distance: 370, size: 10, speed: 0.0018, color: '#87ceeb', texture: 'https://example.com/uranus_texture.jpg' },
+      { name: 'Neptune', distance: 440, size: 10, speed: 0.0016, color: '#4682b4', texture: 'https://example.com/neptune_texture.jpg' }
     ];
 
     let angleOffsets = planets.map(() => Math.random() * Math.PI * 2);
@@ -107,20 +107,20 @@
 
     function drawSaturnRings(x, y, distance) {
       const ringRadius = distance + 20; // Size of the rings
-      const ringWidth = 6; // Width of the rings
+      const ringWidth = 10; // Width of the rings
 
       // Outer ring
       ctx.beginPath();
       ctx.ellipse(x, y, ringRadius, ringRadius / 3, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
       ctx.lineWidth = ringWidth;
       ctx.stroke();
       ctx.closePath();
 
       // Inner ring (more transparent)
       ctx.beginPath();
-      ctx.ellipse(x, y, ringRadius - 6, (ringRadius - 6) / 3, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.ellipse(x, y, ringRadius - 5, (ringRadius - 5) / 3, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.lineWidth = ringWidth;
       ctx.stroke();
       ctx.closePath();
@@ -150,4 +150,5 @@
   </script>
 </body>
 </html>
+
 
