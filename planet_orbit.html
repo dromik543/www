@@ -34,19 +34,19 @@
 
     // Define planets with slowed down orbital speeds and textures (placeholders)
     const planets = [
-      { name: 'Mercury', distance: 50, size: 3, speed: 0.01, color: '#b2b2b2', texture: 'textures/mercury.jpg' },
-      { name: 'Venus', distance: 80, size: 7, speed: 0.008, color: '#f4a460', texture: 'textures/venus.jpg' },
-      { name: 'Earth', distance: 110, size: 8, speed: 0.006, color: '#1e90ff', texture: 'textures/earth.jpg' },
-      { name: 'Mars', distance: 150, size: 6, speed: 0.005, color: '#ff4500', texture: 'textures/mars.jpg' },
-      { name: 'Jupiter', distance: 220, size: 14, speed: 0.004, color: '#d2b48c', texture: 'textures/jupiter.jpg' },
-      { name: 'Saturn', distance: 300, size: 12, speed: 0.003, color: '#f0e68c', texture: 'textures/saturn.jpg', rings: true },
-      { name: 'Uranus', distance: 370, size: 10, speed: 0.002, color: '#87ceeb', texture: 'textures/uranus.jpg' },
-      { name: 'Neptune', distance: 440, size: 10, speed: 0.0015, color: '#4682b4', texture: 'textures/neptune.jpg' }
+      { name: 'Mercury', distance: 50, size: 3, speed: 0.01, color: '#b2b2b2', texture: 'https://example.com/mercury.jpg' },
+      { name: 'Venus', distance: 80, size: 7, speed: 0.008, color: '#f4a460', texture: 'https://example.com/venus.jpg' },
+      { name: 'Earth', distance: 110, size: 8, speed: 0.006, color: '#1e90ff', texture: 'https://example.com/earth.jpg' },
+      { name: 'Mars', distance: 150, size: 6, speed: 0.005, color: '#ff4500', texture: 'https://example.com/mars.jpg' },
+      { name: 'Jupiter', distance: 220, size: 14, speed: 0.004, color: '#d2b48c', texture: 'https://example.com/jupiter.jpg' },
+      { name: 'Saturn', distance: 300, size: 12, speed: 0.003, color: '#f0e68c', texture: 'https://example.com/saturn.jpg', rings: true },
+      { name: 'Uranus', distance: 370, size: 10, speed: 0.002, color: '#87ceeb', texture: 'https://example.com/uranus.jpg' },
+      { name: 'Neptune', distance: 440, size: 10, speed: 0.0015, color: '#4682b4', texture: 'https://example.com/neptune.jpg' }
     ];
 
     let angleOffsets = planets.map(() => Math.random() * Math.PI * 2);
 
-    // Load all the planet textures (placeholder URLs for testing)
+    // Load all the planet textures (use valid URLs for testing)
     const planetTextures = {};
     const texturesLoaded = planets.map(planet => {
       const img = new Image();
@@ -54,7 +54,11 @@
       planetTextures[planet.name] = img;
       return new Promise((resolve) => {
         img.onload = resolve;
-        img.onerror = () => resolve();  // Handle error if image fails to load
+        img.onerror = () => {
+          console.warn(`Failed to load texture for ${planet.name}, using default color.`);
+          planetTextures[planet.name] = null; // Fallback to default color
+          resolve();
+        };
       });
     });
 
@@ -83,14 +87,10 @@
       if (planetTextures[planet.name] && planetTextures[planet.name].complete) {
         ctx.drawImage(planetTextures[planet.name], x - planet.size, y - planet.size, planet.size * 2, planet.size * 2);
       } else {
-        // Fallback to color if no texture or if texture isn't loaded yet
-        const planetGradient = ctx.createRadialGradient(x, y, 0, x, y, planet.size);
-        planetGradient.addColorStop(0, planet.color);
-        planetGradient.addColorStop(1, 'black'); // Shadow effect
-
+        // Fallback to color if no texture is loaded
         ctx.beginPath();
         ctx.arc(x, y, planet.size, 0, Math.PI * 2);
-        ctx.fillStyle = planetGradient;
+        ctx.fillStyle = planet.color;
         ctx.fill();
         ctx.closePath();
       }
@@ -150,3 +150,4 @@
   </script>
 </body>
 </html>
+
