@@ -28,81 +28,94 @@
     const canvas = document.getElementById('orbitCanvas');
     const ctx = canvas.getContext('2d');
 
-    const SUN_RADIUS = 20; // Size of the sun at the center
+    const SUN_RADIUS = 20;
     const CENTER_X = canvas.width / 2;
     const CENTER_Y = canvas.height / 2;
 
-    // Define planets with detailed properties based on real-world attributes
+    // Define planets with detailed properties
     const planets = [
-      { name: 'Mercury', distance: 50, size: 3, speed: 0.04, color: '#b2b2b2' }, // Gray rocky color
-      { name: 'Venus', distance: 80, size: 7, speed: 0.03, color: '#f4a460' }, // Yellowish color
-      { name: 'Earth', distance: 110, size: 8, speed: 0.02, color: '#1e90ff' }, // Blue with some greenish tint
-      { name: 'Mars', distance: 150, size: 6, speed: 0.015, color: '#ff4500' }, // Red hue
-      { name: 'Jupiter', distance: 220, size: 14, speed: 0.008, color: '#d2b48c' }, // Light brown with some bands
-      { name: 'Saturn', distance: 300, size: 12, speed: 0.006, color: '#f0e68c' }, // Pale gold
-      { name: 'Uranus', distance: 370, size: 10, speed: 0.004, color: '#87ceeb' }, // Light blue
-      { name: 'Neptune', distance: 440, size: 10, speed: 0.003, color: '#4682b4' } // Deep blue
+      { name: 'Mercury', distance: 50, size: 3, speed: 0.04, color: '#b2b2b2', rings: false },
+      { name: 'Venus', distance: 80, size: 7, speed: 0.03, color: '#f4a460', rings: false },
+      { name: 'Earth', distance: 110, size: 8, speed: 0.02, color: '#1e90ff', rings: false },
+      { name: 'Mars', distance: 150, size: 6, speed: 0.015, color: '#ff4500', rings: false },
+      { name: 'Jupiter', distance: 220, size: 14, speed: 0.008, color: '#d2b48c', rings: false },
+      { name: 'Saturn', distance: 300, size: 12, speed: 0.006, color: '#f0e68c', rings: true },
+      { name: 'Uranus', distance: 370, size: 10, speed: 0.004, color: '#87ceeb', rings: false },
+      { name: 'Neptune', distance: 440, size: 10, speed: 0.003, color: '#4682b4', rings: false }
     ];
 
-    // Initialize random angles for each planet's starting position
     let angleOffsets = planets.map(() => Math.random() * Math.PI * 2);
 
-    // Draw the Sun at the center
     function drawSun() {
+      const gradient = ctx.createRadialGradient(CENTER_X, CENTER_Y, 0, CENTER_X, CENTER_Y, SUN_RADIUS);
+      gradient.addColorStop(0, 'yellow');
+      gradient.addColorStop(1, 'orange');
+
       ctx.beginPath();
       ctx.arc(CENTER_X, CENTER_Y, SUN_RADIUS, 0, Math.PI * 2);
-      ctx.fillStyle = 'yellow';
+      ctx.fillStyle = gradient;
       ctx.fill();
       ctx.closePath();
     }
 
-    // Draw a planet at a given angle and position
     function drawPlanet(planet, angle) {
-      const x = CENTER_X + planet.distance * Math.cos(angle); // X-coordinate of the planet
-      const y = CENTER_Y + planet.distance * Math.sin(angle); // Y-coordinate of the planet
+      const x = CENTER_X + planet.distance * Math.cos(angle);
+      const y = CENTER_Y + planet.distance * Math.sin(angle);
 
-      // Draw the planet circle
+      // Create a gradient for the planet's surface
+      const planetGradient = ctx.createRadialGradient(x, y, 0, x, y, planet.size);
+      planetGradient.addColorStop(0, planet.color);
+      planetGradient.addColorStop(1, 'black'); // Shadow effect
+
       ctx.beginPath();
       ctx.arc(x, y, planet.size, 0, Math.PI * 2);
-      ctx.fillStyle = planet.color;
+      ctx.fillStyle = planetGradient;
       ctx.fill();
       ctx.closePath();
 
-      // Label the planet with its name
       ctx.fillStyle = 'white';
       ctx.font = '10px Arial';
       ctx.fillText(planet.name, x + 10, y);
+      
+      // If the planet has rings, draw them
+      if (planet.rings) {
+        drawRings(x, y, planet.distance);
+      }
     }
 
-    // Draw the orbital path of a planet
-    function drawOrbit(distance) {
+    function drawRings(x, y, distance) {
+      const ringRadius = distance + 15; // Size of the rings
       ctx.beginPath();
-      ctx.arc(CENTER_X, CENTER_Y, distance, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; // Light transparent color for orbits
+      ctx.ellipse(x, y, ringRadius, ringRadius / 3, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = 2;
       ctx.stroke();
       ctx.closePath();
     }
 
-    // Update and animate the scene
-    function update() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas for redrawing
+    function drawOrbit(distance) {
+      ctx.beginPath();
+      ctx.arc(CENTER_X, CENTER_Y, distance, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.stroke();
+      ctx.closePath();
+    }
 
-      // Draw the Sun
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       drawSun();
 
-      // Draw each planet and its orbit
       planets.forEach((planet, index) => {
-        drawOrbit(planet.distance); // Draw the orbit circle
-        drawPlanet(planet, angleOffsets[index]); // Draw the planet at the current angle
-
-        // Update the planet's angle to simulate motion
+        drawOrbit(planet.distance);
+        drawPlanet(planet, angleOffsets[index]);
         angleOffsets[index] += planet.speed;
       });
 
-      requestAnimationFrame(update); // Keep the animation running
+      requestAnimationFrame(update);
     }
 
-    update(); // Start the animation
+    update();
   </script>
 </body>
 </html>
