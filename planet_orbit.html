@@ -23,7 +23,7 @@
 </head>
 <body>
   <h1>Planetary Orbit Simulator</h1>
-  <canvas id="orbitCanvas" width="600" height="600"></canvas>
+  <canvas id="orbitCanvas" width="800" height="800"></canvas>
   <script>
     const canvas = document.getElementById('orbitCanvas');
     const ctx = canvas.getContext('2d');
@@ -32,16 +32,16 @@
     const CENTER_X = canvas.width / 2;
     const CENTER_Y = canvas.height / 2;
 
-    // Define planets with detailed properties, including distance, size, speed, and color
+    // Define planets with detailed properties based on real-world attributes
     const planets = [
-      { name: 'Mercury', distance: 40, size: 3, speed: 0.04, color: 'gray' },
-      { name: 'Venus', distance: 70, size: 5, speed: 0.03, color: 'orange' },
-      { name: 'Earth', distance: 100, size: 6, speed: 0.02, color: 'blue' },
-      { name: 'Mars', distance: 130, size: 4, speed: 0.015, color: 'red' },
-      { name: 'Jupiter', distance: 180, size: 10, speed: 0.008, color: 'brown' },
-      { name: 'Saturn', distance: 240, size: 8, speed: 0.006, color: 'goldenrod' },
-      { name: 'Uranus', distance: 300, size: 7, speed: 0.004, color: 'lightblue' },
-      { name: 'Neptune', distance: 360, size: 7, speed: 0.003, color: 'darkblue' }
+      { name: 'Mercury', distance: 50, size: 3, speed: 0.04, color: '#b2b2b2' }, // Gray rocky color
+      { name: 'Venus', distance: 80, size: 7, speed: 0.03, color: '#f4a460' }, // Yellowish color
+      { name: 'Earth', distance: 110, size: 8, speed: 0.02, color: '#1e90ff' }, // Blue with some greenish tint
+      { name: 'Mars', distance: 150, size: 6, speed: 0.015, color: '#ff4500' }, // Red hue
+      { name: 'Jupiter', distance: 220, size: 14, speed: 0.008, color: '#d2b48c' }, // Light brown with some bands
+      { name: 'Saturn', distance: 300, size: 12, speed: 0.006, color: '#f0e68c' }, // Pale gold
+      { name: 'Uranus', distance: 370, size: 10, speed: 0.004, color: '#87ceeb' }, // Light blue
+      { name: 'Neptune', distance: 440, size: 10, speed: 0.003, color: '#4682b4' } // Deep blue
     ];
 
     // Initialize random angles for each planet's starting position
