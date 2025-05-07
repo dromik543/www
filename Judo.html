@@ -1,10 +1,128 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="cs">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Judo</title>
+  <style>
+    :root {
+      --red: #d62828;
+      --blue: #003049;
+      --white: #f8f9fa;
+    }
 
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--white);
+      color: var(--blue);
+    }
+
+    header {
+      background-color: var(--red);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    nav {
+      background-color: var(--blue);
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: var(--white);
+      padding: 1rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      background-color: var(--red);
+    }
+
+    section {
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    h2 {
+      border-bottom: 2px solid var(--blue);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    footer {
+      background-color: var(--blue);
+      color: var(--white);
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+  </style>
 </head>
-
 <body>
+  <header>
+    <h1>Judo</h1>
+    <p>Moje stránka o judu</p>
+  </header>
 
+  <nav>
+    <a href="#o-judu">O judu</a>
+    <a href="#techniky">Techniky</a>
+    <a href="#treningy">Tréninky</a>
+    <a href="#moje-cesta">Moje cesta</a>
+    <a href="#tipy">Tipy</a>
+    <a href="#fotogalerie">Fotogalerie</a>
+    <a href="#kontakt">O mně</a>
+  </nav>
+
+  <section id="o-judu">
+    <h2>O judu</h2>
+    <p>Judo je japonské bojové umění a olympijský sport. Zaměřuje se na hody, chvaty a práci na zemi. Vzniklo koncem 19. století v Japonsku.</p>
+  </section>
+
+  <section id="techniky">
+    <h2>Techniky a pásky</h2>
+    <p>V judu existují různé pásky podle úrovně. Každý pás znamená pokrok. Jsou zde techniky jako o-goshi, seoi-nage, kuzure-kesa-gatame a další.</p>
+  </section>
+
+  <section id="treningy">
+    <h2>Tréninky</h2>
+    <p>Na tréninku se zahříváme, děláme kotouly, techniky a cvičíme s partnerem. Tréninky jsou zábavné a učíme se i disciplíně.</p>
+  </section>
+
+  <section id="moje-cesta">
+    <h2>Moje cesta</h2>
+    <p>Tady můžeš napsat, kdy jsi začala s judem, jaké máš zážitky z tréninků nebo soutěží a co tě nejvíc baví.</p>
+  </section>
+
+  <section id="tipy">
+    <h2>Tipy pro začátečníky</h2>
+    <ul>
+      <li>Buď trpělivá, každý se zlepšuje postupně.</li>
+      <li>Poslouchej trenéra a spolupracuj s partnerem.</li>
+      <li>Neboj se chyb, jsou součástí učení.</li>
+    </ul>
+  </section>
+
+  <section id="fotogalerie">
+    <h2>Fotogalerie</h2>
+    <p>Zde si můžeš přidat své fotky z tréninků:</p>
+    <!-- Přidání fotek: nahraj obrázky do stejné složky a použij následující kód:
+    <img src="moje-fotka.jpg" alt="Judo trénink" style="max-width: 100%; height: auto; margin-bottom: 1rem;" /> -->
+  </section>
+
+  <section id="kontakt">
+    <h2>O mně</h2>
+    <p>Jmenuji se Lenlea a trénuji judo. Tato stránka je pro všechny, kdo mají rádi bojová umění stejně jako já!</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Judo by Lenlea</p>
+  </footer>
 </body>
+</html>
