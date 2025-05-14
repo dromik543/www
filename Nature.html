@@ -1,67 +1,72 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Leaf, Globe, Recycle } from "lucide-react";
+import { Sparkles, TreePalm, Droplet } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function EnvironmentalProtectionPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-blue-100 p-6">
-      <div className="max-w-5xl mx-auto text-center">
-        <motion.h1 
-          className="text-5xl font-bold text-green-800 mb-4"
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          Ochrana životního prostředí
-        </motion.h1>
-        <p className="text-lg text-green-700 mb-12">
-          Příroda je náš domov. Pojďme ji společně chránit.
-        </p>
+    <main className="min-h-screen bg-gradient-to-br from-lime-200 via-sky-100 to-emerald-100 flex items-center justify-center p-6">
+      <div className="w-full max-w-6xl">
+        <section className="text-center mb-16">
+          <motion.h1
+            className="text-7xl font-extrabold text-emerald-700 drop-shadow-xl mb-4"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+          >
+            Zelená budoucnost
+          </motion.h1>
+          <p className="text-xl text-emerald-600 max-w-2xl mx-auto">
+            Společně můžeme vytvořit krásnější a čistější svět. Začni jedním malým krokem právě dnes.
+          </p>
+        </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="rounded-2xl shadow-lg bg-white hover:scale-105 transition-transform">
-            <CardContent className="p-6 text-center">
-              <Leaf className="text-green-500 w-12 h-12 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-green-800 mb-2">Zasaď strom</h2>
-              <p className="text-green-700">
-                Stromy čistí vzduch a poskytují útočiště zvířatům. Každý strom se počítá.
-              </p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <motion.div 
+            className="bg-white rounded-3xl shadow-xl p-8 text-center hover:scale-105 transition-transform"
+            whileHover={{ scale: 1.05 }}
+          >
+            <TreePalm className="w-14 h-14 text-green-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-green-700 mb-2">Zasaď strom</h2>
+            <p className="text-green-600">
+              Stromy chrání půdu, čistí vzduch a pomáhají přírodě růst. Jeden strom může změnit mnoho.
+            </p>
+          </motion.div>
 
-          <Card className="rounded-2xl shadow-lg bg-white hover:scale-105 transition-transform">
-            <CardContent className="p-6 text-center">
-              <Recycle className="text-green-500 w-12 h-12 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-green-800 mb-2">Třiď odpad</h2>
-              <p className="text-green-700">
-                Recyklace pomáhá snižovat množství odpadu a šetří přírodní zdroje.
-              </p>
-            </CardContent>
-          </Card>
+          <motion.div 
+            className="bg-white rounded-3xl shadow-xl p-8 text-center hover:scale-105 transition-transform"
+            whileHover={{ scale: 1.05 }}
+          >
+            <Droplet className="w-14 h-14 text-sky-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-sky-700 mb-2">Šetři vodu</h2>
+            <p className="text-sky-600">
+              Voda je vzácná. Uzavírej kohoutky, sbírej dešťovku a chraň vodní zdroje pro budoucnost.
+            </p>
+          </motion.div>
 
-          <Card className="rounded-2xl shadow-lg bg-white hover:scale-105 transition-transform">
-            <CardContent className="p-6 text-center">
-              <Globe className="text-green-500 w-12 h-12 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-green-800 mb-2">Chraň planetu</h2>
-              <p className="text-green-700">
-                I malé každodenní činy mohou vést k velkým změnám pro naši Zemi.
-              </p>
-            </CardContent>
-          </Card>
+          <motion.div 
+            className="bg-white rounded-3xl shadow-xl p-8 text-center hover:scale-105 transition-transform"
+            whileHover={{ scale: 1.05 }}
+          >
+            <Sparkles className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-yellow-600 mb-2">Měň svět</h2>
+            <p className="text-yellow-600">
+              Malé činy jako třídění odpadu, bezplastový nákup nebo jízda na kole mají obrovský dopad.
+            </p>
+          </motion.div>
         </div>
 
-        <motion.div
-          className="mt-16"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 1.5 }}
-        >
-          <Button className="bg-green-600 hover:bg-green-700 text-white text-lg py-6 px-10 rounded-2xl shadow-md">
-            Přidej se k ochráncům přírody
-          </Button>
-        </motion.div>
+        <div className="text-center mt-20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
+          >
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-xl py-5 px-12 rounded-full shadow-lg">
+              Připoj se ke změně 💚
+            </Button>
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
