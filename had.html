@@ -14,6 +14,7 @@
       align-items: flex-start;
       height: 100vh;
       padding-top: 40px;
+      overflow: hidden;
     }
 
     .container {
@@ -61,7 +62,6 @@
       box-shadow: 0 0 20px cyan;
     }
 
-    /* Panel s pravidly */
     .sidebar {
       width: 220px;
       padding: 15px;
@@ -82,7 +82,6 @@
       line-height: 1.5;
     }
 
-    /* Ikona nastavení */
     #settingsIcon {
       position: absolute;
       top: 10px;
@@ -92,7 +91,6 @@
       text-shadow: 0 0 10px cyan;
     }
 
-    /* Okno nastavení */
     #settingsPanel {
       position: absolute;
       top: 50px;
@@ -111,20 +109,33 @@
       font-size: 1.2em;
       text-shadow: 0 0 8px cyan;
     }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: transparent url("https://www.transparenttextures.com/patterns/stardust.png");
+      animation: moveStars 100s linear infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+
+    @keyframes moveStars {
+      from {background-position: 0 0;}
+      to {background-position: 10000px 10000px;}
+    }
   </style>
 </head>
 <body>
-  <!-- Ikona nastavení -->
   <div id="settingsIcon" onclick="toggleSettings()">⚙️</div>
 
-  <!-- Panel nastavení -->
   <div id="settingsPanel">
     <h3>Nastavení</h3>
     <button onclick="toggleMusic()">🎵 Hudba</button>
   </div>
 
   <div class="container">
-    <!-- Herní část -->
     <div class="game-area">
       <h1>🌌 Vesmírný Had 🚀</h1>
       <div id="score">Skóre: 0</div>
@@ -134,18 +145,17 @@
       </div>
     </div>
 
-    <!-- Pravidla -->
     <div class="sidebar">
       <h2>📜 Pravidla</h2>
       <p>1. Pohybuj se šipkami ⬅️ ⬆️ ➡️ ⬇️.</p>
       <p>2. Sněz asteroid 🪐 a získej body.</p>
       <p>3. Každý asteroid = +1 bod.</p>
-      <p>4. Nenarážej do zdi ani do sebe!</p>
-      <p>5. Klikni na <b>Restart</b>, když chceš začít znovu.</p>
+      <p>4. Od 10 bodů a po každých 5 bodech přibývají překážky!</p>
+      <p>5. Nenarážej do zdi, do sebe ani do překážky!</p>
+      <p>6. Klikni na <b>Restart</b>, když chceš začít znovu.</p>
     </div>
   </div>
 
-  <!-- Hudba -->
   <audio id="bgMusic" loop>
     <source src="https://www.bensound.com/bensound-music/bensound-scifi.mp3" type="audio/mpeg">
   </audio>
@@ -155,18 +165,36 @@
     const ctx = canvas.getContext("2d");
     const box = 20;
     let snake, direction, food, score, game;
+    let obstacles = [];
+    let musicPlaying = false;
+    const music = document.getElementById("bgMusic");
 
     function initGame() {
       snake = [{x: 9 * box, y: 10 * box}];
       direction = null;
       score = 0;
-      food = {
-        x: Math.floor(Math.random()*19+1)*box,
-        y: Math.floor(Math.random()*19+1)*box
-      };
+      obstacles = [];
+      food = { x: Math.floor(Math.random()*19+1)*box, y: Math.floor(Math.random()*19+1)*box };
       document.getElementById("score").innerText = "Skóre: " + score;
-      if (game) clearInterval(game);
+      if(game) clearInterval(game);
       game = setInterval(draw, 100);
+    }
+
+    function addObstacle() {
+      let newObstacle;
+      let valid = false;
+
+      while(!valid) {
+        newObstacle = {
+          x: Math.floor(Math.random()*19+1)*box,
+          y: Math.floor(Math.random()*19+1)*box
+        };
+        valid = !snake.some(s => s.x === newObstacle.x && s.y === newObstacle.y)
+                && !(food.x === newObstacle.x && food.y === newObstacle.y)
+                && !obstacles.some(o => o.x === newObstacle.x && o.y === newObstacle.y);
+      }
+
+      obstacles.push(newObstacle);
     }
 
     document.addEventListener("keydown", e => {
@@ -177,11 +205,11 @@
     });
 
     function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
 
       // had
-      for(let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = i === 0 ? "cyan" : "lime";
+      for(let i=0;i<snake.length;i++){
+        ctx.fillStyle = i===0 ? "cyan" : "lime";
         ctx.shadowBlur = 15;
         ctx.shadowColor = "cyan";
         ctx.fillRect(snake[i].x, snake[i].y, box-2, box-2);
@@ -192,69 +220,63 @@
       ctx.shadowBlur = 20;
       ctx.shadowColor = "orange";
       ctx.fillStyle = "yellow";
-      ctx.arc(food.x + box/2, food.y + box/2, box/2, 0, Math.PI*2);
+      ctx.arc(food.x+box/2, food.y+box/2, box/2, 0, Math.PI*2);
       ctx.fill();
 
-      // pohyb
+      // překážky
+      for(let obs of obstacles){
+        ctx.fillStyle = "red";
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "red";
+        ctx.fillRect(obs.x, obs.y, box, box);
+      }
+
       let snakeX = snake[0].x;
       let snakeY = snake[0].y;
-      if(direction === "LEFT") snakeX -= box;
-      if(direction === "UP") snakeY -= box;
-      if(direction === "RIGHT") snakeX += box;
-      if(direction === "DOWN") snakeY += box;
+      if(direction==="LEFT") snakeX -= box;
+      if(direction==="UP") snakeY -= box;
+      if(direction==="RIGHT") snakeX += box;
+      if(direction==="DOWN") snakeY += box;
 
       // jídlo snězeno
-      if(snakeX === food.x && snakeY === food.y) {
+      if(snakeX===food.x && snakeY===food.y){
         score++;
-        document.getElementById("score").innerText = "Skóre: " + score;
-        food = {
-          x: Math.floor(Math.random()*19+1)*box,
-          y: Math.floor(Math.random()*19+1)*box
-        };
-      } else {
-        snake.pop();
-      }
+        document.getElementById("score").innerText = "Skóre: "+score;
+        food = { x: Math.floor(Math.random()*19+1)*box, y: Math.floor(Math.random()*19+1)*box };
+
+        if(score===10 || (score>10 && score%5===0)){
+          addObstacle();
+        }
+      } else snake.pop();
 
       let newHead = {x: snakeX, y: snakeY};
 
-      // kolize
-      if(snakeX < 0 || snakeY < 0 || snakeX >= canvas.width || snakeY >= canvas.height || collision(newHead, snake)){
+      if(snakeX<0 || snakeY<0 || snakeX>=canvas.width || snakeY>=canvas.height
+         || collision(newHead, snake) || collision(newHead, obstacles)){
         clearInterval(game);
-        alert("Game Over! Tvůj výsledek: " + score);
+        alert("Game Over! Tvůj výsledek: "+score);
         return;
       }
 
       snake.unshift(newHead);
     }
 
-    function collision(head, array){
-      return array.some(s => head.x === s.x && head.y === s.y);
+    function collision(head,array){
+      return array.some(s => head.x===s.x && head.y===s.y);
     }
 
-    function restartGame(){
-      initGame();
+    function restartGame(){ initGame(); }
+
+    function toggleMusic(){
+      if(musicPlaying){ music.pause(); musicPlaying=false; }
+      else { music.play(); musicPlaying=true; }
     }
 
-    // Hudba
-    let musicPlaying = false;
-    const music = document.getElementById("bgMusic");
-    function toggleMusic() {
-      if(musicPlaying) {
-        music.pause();
-        musicPlaying = false;
-      } else {
-        music.play();
-        musicPlaying = true;
-      }
-    }
-
-    // Panel nastavení
     function toggleSettings(){
       const panel = document.getElementById("settingsPanel");
-      panel.style.display = panel.style.display === "block" ? "none" : "block";
+      panel.style.display = panel.style.display==="block" ? "none" : "block";
     }
 
-    // start hry
     initGame();
   </script>
 </body>
