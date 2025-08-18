@@ -6,41 +6,42 @@
   <style>
     body {
       margin: 0;
-      height: 100vh;
+      background: radial-gradient(circle at center, #000010 0%, #000000 100%);
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
       display: flex;
       justify-content: center;
-      align-items: center;
-      background: radial-gradient(circle at center, #000010 0%, #000000 100%);
-      overflow: hidden;
-      color: white;
-      font-family: 'Segoe UI', sans-serif;
+      align-items: flex-start;
+      height: 100vh;
+      padding-top: 40px;
     }
 
     .container {
       display: flex;
       gap: 30px;
-      align-items: flex-start;
+    }
+
+    .game-area {
+      text-align: center;
     }
 
     h1 {
-      margin: 10px;
       font-size: 2em;
       text-shadow: 0 0 10px cyan, 0 0 20px blue;
-      text-align: center;
     }
 
     #gameCanvas {
-      background: transparent;
+      background: black;
       border: 2px solid cyan;
       box-shadow: 0 0 20px cyan;
       display: block;
+      margin: auto;
     }
 
     #score {
-      font-size: 1.3em;
-      margin: 8px;
+      font-size: 1.2em;
+      margin: 8px 0;
       text-shadow: 0 0 8px lime;
-      text-align: center;
     }
 
     button {
@@ -81,33 +82,55 @@
       line-height: 1.5;
     }
 
-    /* Hvězdné pozadí */
-    body::before {
-      content: "";
+    /* Ikona nastavení */
+    #settingsIcon {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: transparent url("https://www.transparenttextures.com/patterns/stardust.png");
-      animation: moveStars 100s linear infinite;
-      z-index: -1;
-      opacity: 0.6;
+      top: 10px;
+      left: 10px;
+      font-size: 28px;
+      cursor: pointer;
+      text-shadow: 0 0 10px cyan;
     }
-    @keyframes moveStars {
-      from {background-position: 0 0;}
-      to {background-position: 10000px 10000px;}
+
+    /* Okno nastavení */
+    #settingsPanel {
+      position: absolute;
+      top: 50px;
+      left: 10px;
+      width: 180px;
+      padding: 12px;
+      background: rgba(0,0,30,0.9);
+      border: 2px solid cyan;
+      border-radius: 10px;
+      box-shadow: 0 0 15px cyan;
+      display: none;
+    }
+
+    #settingsPanel h3 {
+      margin-top: 0;
+      font-size: 1.2em;
+      text-shadow: 0 0 8px cyan;
     }
   </style>
 </head>
 <body>
+  <!-- Ikona nastavení -->
+  <div id="settingsIcon" onclick="toggleSettings()">⚙️</div>
+
+  <!-- Panel nastavení -->
+  <div id="settingsPanel">
+    <h3>Nastavení</h3>
+    <button onclick="toggleMusic()">🎵 Hudba</button>
+  </div>
+
   <div class="container">
     <!-- Herní část -->
     <div class="game-area">
       <h1>🌌 Vesmírný Had 🚀</h1>
       <div id="score">Skóre: 0</div>
       <canvas id="gameCanvas" width="400" height="400"></canvas>
-      <div style="text-align:center;">
+      <div>
         <button onclick="restartGame()">Restart</button>
-        <button onclick="toggleMusic()">🎵 Hudba</button>
       </div>
     </div>
 
@@ -115,9 +138,9 @@
     <div class="sidebar">
       <h2>📜 Pravidla</h2>
       <p>1. Pohybuj se šipkami ⬅️ ⬆️ ➡️ ⬇️.</p>
-      <p>2. Sněz zářící asteroid 🪐, abys získal body.</p>
+      <p>2. Sněz asteroid 🪐 a získej body.</p>
       <p>3. Každý asteroid = +1 bod.</p>
-      <p>4. Pokud narazíš do zdi nebo do sebe → konec hry!</p>
+      <p>4. Nenarážej do zdi ani do sebe!</p>
       <p>5. Klikni na <b>Restart</b>, když chceš začít znovu.</p>
     </div>
   </div>
@@ -131,21 +154,27 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const box = 20;
-    let snake = [{x: 9 * box, y: 10 * box}];
-    let direction;
-    let food = {
-      x: Math.floor(Math.random()*19+1)*box,
-      y: Math.floor(Math.random()*19+1)*box
-    };
-    let score = 0;
+    let snake, direction, food, score, game;
 
-    document.addEventListener("keydown", dir);
-    function dir(event) {
-      if(event.keyCode === 37 && direction !== "RIGHT") direction = "LEFT";
-      else if(event.keyCode === 38 && direction !== "DOWN") direction = "UP";
-      else if(event.keyCode === 39 && direction !== "LEFT") direction = "RIGHT";
-      else if(event.keyCode === 40 && direction !== "UP") direction = "DOWN";
+    function initGame() {
+      snake = [{x: 9 * box, y: 10 * box}];
+      direction = null;
+      score = 0;
+      food = {
+        x: Math.floor(Math.random()*19+1)*box,
+        y: Math.floor(Math.random()*19+1)*box
+      };
+      document.getElementById("score").innerText = "Skóre: " + score;
+      if (game) clearInterval(game);
+      game = setInterval(draw, 100);
     }
+
+    document.addEventListener("keydown", e => {
+      if(e.keyCode === 37 && direction !== "RIGHT") direction = "LEFT";
+      else if(e.keyCode === 38 && direction !== "DOWN") direction = "UP";
+      else if(e.keyCode === 39 && direction !== "LEFT") direction = "RIGHT";
+      else if(e.keyCode === 40 && direction !== "UP") direction = "DOWN";
+    });
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -153,12 +182,12 @@
       // had
       for(let i = 0; i < snake.length; i++) {
         ctx.fillStyle = i === 0 ? "cyan" : "lime";
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 15;
         ctx.shadowColor = "cyan";
         ctx.fillRect(snake[i].x, snake[i].y, box-2, box-2);
       }
 
-      // jídlo (asteroid)
+      // jídlo
       ctx.beginPath();
       ctx.shadowBlur = 20;
       ctx.shadowColor = "orange";
@@ -166,16 +195,15 @@
       ctx.arc(food.x + box/2, food.y + box/2, box/2, 0, Math.PI*2);
       ctx.fill();
 
-      // pohyb hada
+      // pohyb
       let snakeX = snake[0].x;
       let snakeY = snake[0].y;
-
       if(direction === "LEFT") snakeX -= box;
       if(direction === "UP") snakeY -= box;
       if(direction === "RIGHT") snakeX += box;
       if(direction === "DOWN") snakeY += box;
 
-      // když sní jídlo
+      // jídlo snězeno
       if(snakeX === food.x && snakeY === food.y) {
         score++;
         document.getElementById("score").innerText = "Skóre: " + score;
@@ -193,27 +221,18 @@
       if(snakeX < 0 || snakeY < 0 || snakeX >= canvas.width || snakeY >= canvas.height || collision(newHead, snake)){
         clearInterval(game);
         alert("Game Over! Tvůj výsledek: " + score);
+        return;
       }
 
       snake.unshift(newHead);
     }
 
     function collision(head, array){
-      for(let i = 0; i < array.length; i++){
-        if(head.x === array[i].x && head.y === array[i].y){
-          return true;
-        }
-      }
-      return false;
+      return array.some(s => head.x === s.x && head.y === s.y);
     }
 
     function restartGame(){
-      snake = [{x: 9 * box, y: 10 * box}];
-      direction = null;
-      score = 0;
-      document.getElementById("score").innerText = "Skóre: 0";
-      clearInterval(game);
-      game = setInterval(draw, 100);
+      initGame();
     }
 
     // Hudba
@@ -229,8 +248,14 @@
       }
     }
 
-    let game = setInterval(draw, 100);
+    // Panel nastavení
+    function toggleSettings(){
+      const panel = document.getElementById("settingsPanel");
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    }
+
+    // start hry
+    initGame();
   </script>
 </body>
 </html>
-
