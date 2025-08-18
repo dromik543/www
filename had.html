@@ -8,7 +8,6 @@
       margin: 0;
       height: 100vh;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       background: radial-gradient(circle at center, #000010 0%, #000000 100%);
@@ -17,22 +16,31 @@
       font-family: 'Segoe UI', sans-serif;
     }
 
+    .container {
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+    }
+
     h1 {
       margin: 10px;
       font-size: 2em;
       text-shadow: 0 0 10px cyan, 0 0 20px blue;
+      text-align: center;
     }
 
     #gameCanvas {
       background: transparent;
       border: 2px solid cyan;
       box-shadow: 0 0 20px cyan;
+      display: block;
     }
 
     #score {
       font-size: 1.3em;
       margin: 8px;
       text-shadow: 0 0 8px lime;
+      text-align: center;
     }
 
     button {
@@ -50,6 +58,27 @@
     button:hover {
       transform: scale(1.1);
       box-shadow: 0 0 20px cyan;
+    }
+
+    /* Panel s pravidly */
+    .sidebar {
+      width: 220px;
+      padding: 15px;
+      background: rgba(0,0,30,0.6);
+      border: 2px solid cyan;
+      border-radius: 12px;
+      box-shadow: 0 0 15px cyan;
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+      font-size: 1.4em;
+      text-shadow: 0 0 10px cyan;
+    }
+
+    .sidebar p {
+      font-size: 0.95em;
+      line-height: 1.5;
     }
 
     /* Hvězdné pozadí */
@@ -70,10 +99,33 @@
   </style>
 </head>
 <body>
-  <h1>🌌 Vesmírný Had 🚀</h1>
-  <div id="score">Skóre: 0</div>
-  <canvas id="gameCanvas" width="400" height="400"></canvas>
-  <button onclick="restartGame()">Restart</button>
+  <div class="container">
+    <!-- Herní část -->
+    <div class="game-area">
+      <h1>🌌 Vesmírný Had 🚀</h1>
+      <div id="score">Skóre: 0</div>
+      <canvas id="gameCanvas" width="400" height="400"></canvas>
+      <div style="text-align:center;">
+        <button onclick="restartGame()">Restart</button>
+        <button onclick="toggleMusic()">🎵 Hudba</button>
+      </div>
+    </div>
+
+    <!-- Pravidla -->
+    <div class="sidebar">
+      <h2>📜 Pravidla</h2>
+      <p>1. Pohybuj se šipkami ⬅️ ⬆️ ➡️ ⬇️.</p>
+      <p>2. Sněz zářící asteroid 🪐, abys získal body.</p>
+      <p>3. Každý asteroid = +1 bod.</p>
+      <p>4. Pokud narazíš do zdi nebo do sebe → konec hry!</p>
+      <p>5. Klikni na <b>Restart</b>, když chceš začít znovu.</p>
+    </div>
+  </div>
+
+  <!-- Hudba -->
+  <audio id="bgMusic" loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-scifi.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
@@ -164,7 +216,21 @@
       game = setInterval(draw, 100);
     }
 
+    // Hudba
+    let musicPlaying = false;
+    const music = document.getElementById("bgMusic");
+    function toggleMusic() {
+      if(musicPlaying) {
+        music.pause();
+        musicPlaying = false;
+      } else {
+        music.play();
+        musicPlaying = true;
+      }
+    }
+
     let game = setInterval(draw, 100);
   </script>
 </body>
 </html>
+
