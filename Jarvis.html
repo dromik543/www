@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Jarvis — pastelový AI asistent</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#ffd6e8;
+    --yellow:#fff7c2;
+    --blue:#dff4ff;
+    --glass: rgba(255,255,255,0.75);
+    --accent:#ff8ac0;
+    --muted:#555;
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:"Poppins",system-ui,Segoe UI,Roboto,Arial;
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: linear-gradient(135deg,var(--pink),var(--yellow),var(--blue));
+    padding:28px;
+  }
+
+  .card{
+    width:100%;
+    max-width:920px;
+    background:var(--glass);
+    border-radius:24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    overflow:hidden;
+    display:grid;
+    grid-template-columns: 320px 1fr;
+    gap:0;
+  }
+
+  /* left panel - Jarvis info */
+  .left{
+    padding:22px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.5));
+    border-right: 1px solid rgba(0,0,0,0.03);
+  }
+  .avatar{
+    width:120px;
+    height:120px;
+    margin:0 auto 12px;
+    border-radius:20px;
+    background: linear-gradient(135deg,#ffeaf4,#e3f4ff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    color:var(--accent);
+    font-size:34px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  }
+  h2{ text-align:center; margin:10px 0 6px; color:#ff6ea8; }
+  p.desc{ text-align:center; font-size:14px; color:var(--muted); margin:0 0 16px; }
+  .controls{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .btn{
+    background:white; border-radius:12px; padding:8px 12px; border:none; cursor:pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04); font-weight:600;
+  }
+  .btn.talk{ background:linear-gradient(90deg,#ffd6e8,#dff4ff); color:#333 }
+  .small{ font-size:13px; color:#666; text-align:center; margin-top:14px }
+
+  /* right panel - chat */
+  .right{ display:flex; flex-direction:column; height:600px; }
+  .header{
+    padding:18px 18px; display:flex; gap:12px; align-items:center;
+    background: linear-gradient(90deg, rgba(255,255,255,0.8), rgba(255,255,255,0.65));
+    border-bottom:1px solid rgba(0,0,0,0.04);
+  }
+  .status{
+    width:10px; height:10px; border-radius:50%; background:#8affc1; box-shadow:0 0 6px #8affc1;
+  }
+  .header h3{ margin:0; color:#444; font-size:18px; }
+  .chat{
+    padding:18px;
+    overflow:auto;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.2));
+    flex:1;
+  }
+  .msg{ max-width:76%; margin:8px 0; padding:12px 14px; border-radius:14px; line-height:1.35; }
+  .msg.user{ margin-left:auto; background: linear-gradient(90deg,#fff,#ffeef8); border:1px solid rgba(255,138,176,0.14) }
+  .msg.jarvis{ background: linear-gradient(90deg,#f0fbff,#fffbe6); border:1px solid rgba(109,169,255,0.16); color:#1a364a }
+  .meta{ font-size:11px; color:#666; margin-top:6px; }
+
+  .composer{
+    padding:12px;
+    display:flex;
+    gap:10px;
+    border-top:1px solid rgba(0,0,0,0.04);
+    background: rgba(255,255,255,0.6);
+  }
+  .composer input{
+    flex:1; padding:12px 14px; border-radius:12px; border:1px solid rgba(0,0,0,0.06);
+    font-size:15px;
+  }
+  .composer button{ padding:10px 14px; border-radius:12px; border:none; cursor:pointer; font-weight:700; background:linear-gradient(90deg,#ffd6e8,#dff4ff) }
+
+  /* small responsive */
+  @media (max-width:880px){
+    .card{ grid-template-columns: 1fr; }
+    .left{ order:2 }
+    .right{ order:1; height:640px }
+  }
+</style>
+</head>
+<body>
+
+<div class="card" role="application" aria-label="Jarvis pastel chatbot">
+  <aside class="left">
+    <div class="avatar" id="avatar">J</div>
+    <h2 id="jarvis-name">Jarvis</h2>
+    <p class="desc">Tvůj pastelový AI pomocník — klidně se na mě zeptej cokoliv :)</p>
+
+    <div class="controls">
+      <button class="btn talk" id="toggle-speak">🔊 Mluvit</button>
+      <button class="btn" id="clear">🧹 Vymazat chat</button>
+      <button class="btn" id="save">💾 Uložit konverzaci</button>
+    </div>
+
+    <p class="small">Tip: napiš "vymysli příběh" nebo "zahraj si hru". Jméno Jarvis můžeš změnit přímo v kódu.</p>
+  </aside>
+
+  <section class="right">
+    <div class="header">
+      <div class="status" title="online"></div>
+      <h3>Jarvis — Pastelový pomocník</h3>
+    </div>
+
+    <div class="chat" id="chat" aria-live="polite">
+      <!-- zprávy se vkládají sem -->
+    </div>
+
+    <div class="composer">
+      <input id="input" placeholder="Napiš sem otázku nebo příkaz... (např. Ahoj, vymysli příběh)" autocomplete="off" />
+      <button id="send">Odeslat</button>
+    </div>
+  </section>
+</div>
+
+<script>
+/* =============== jednoduché "AI" pravidlové odpovědi =============== */
+
+const jarvisName = "Jarvis"; // změň pokud chceš jiné jméno
+const chatEl = document.getElementById('chat');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('send');
+const clearBtn = document.getElementById('clear');
+const saveBtn = document.getElementById('save');
+const toggleSpeakBtn = document.getElementById('toggle-speak');
+
+let speakEnabled = false;
+let voice = null;
+
+// inicializace mluvení (pokud podporováno)
+function initSpeech(){
+  if(!('speechSynthesis' in window)) return;
+  const voices = speechSynthesis.getVoices();
+  if (voices.length) voice = voices.find(v=>v.lang.startsWith('cs')) || voices[0];
+}
+initSpeech();
+if (typeof speechSynthesis !== 'undefined') {
+  speechSynthesis.onvoiceschanged = initSpeech;
+}
+
+// uložit/načíst chat z localStorage
+function loadChat(){
+  const saved = localStorage.getItem('jarvis_chat_v1');
+  if(saved){
+    const msgs = JSON.parse(saved);
+    msgs.forEach(m => appendMessage(m.text, m.who, false));
+  } else {
+    appendMessage('Ahoj! Jmenuji se ' + jarvisName + ' — co pro tebe můžu udělat dnes? 😊', 'jarvis', false);
+  }
+}
+function saveChat(){
+  const msgs = Array.from(chatEl.querySelectorAll('.msg')).map(el=>{
+    return { who: el.dataset.who, text: el.querySelector('.bubble')?.innerText || el.innerText };
+  });
+  localStorage.setItem('jarvis_chat_v1', JSON.stringify(msgs));
+  alert('Konverzace uložena do prohlížeče.');
+}
+
+function clearChat(){
+  if(confirm('Opravdu chceš vymazat konverzaci?')) {
+    chatEl.innerHTML = '';
+    localStorage.removeItem('jarvis_chat_v1');
+    appendMessage('Chat byl vymazán. Ahoj znovu! 😊', 'jarvis', false);
+  }
+}
+
+// přidání zprávy do UI
+function appendMessage(text, who='jarvis', scroll=true){
+  const div = document.createElement('div');
+  div.className = 'msg ' + (who==='user' ? 'user' : 'jarvis');
+  div.dataset.who = who;
+  div.innerHTML = '<div class="bubble">'+escapeHtml(text)+'</div>';
+  chatEl.appendChild(div);
+  if(scroll) chatEl.scrollTop = chatEl.scrollHeight;
+  if(who==='jarvis' && speakEnabled) speak(text);
+}
+
+// jednoduché escape
+function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+// řešení vstupu uživatele
+function handleInput(raw){
+  const text = raw.trim();
+  if(!text) return;
+  appendMessage(text,'user');
+
+  // jednoduché "porozumění"
+  const t = text.toLowerCase().replace(/[^\w\sáčďéěíňóřšťúůýžüöä]+/g,'').trim();
+
+  // klíčové fráze:
+  if(/^(ahoj|čau|nazdar|servus|hello|hi)\b/.test(t)){
+    replyRandom([
+      'Ahoj! Jak ti mohu pomoci? 💫',
+      'Čau! Co bys dnes chtěla dělat?',
+      'Ahoj, jsem tady pro tebe!'
+    ]);
+    return;
+  }
+
+  if(t.includes('jak se mas') || t.includes('jak se máš')){
+    replyRandom(['Mám se skvěle, díky! 😊 A ty?','Jsem připravený ti pomoci — co máš na srdci?']);
+    return;
+  }
+
+  if(t.includes('kdo jsi') || t.includes('kdo jsi?') || t.includes('kdo jsis')){
+    appendMessage(`Jsem ${jarvisName} — tvůj pastelový AI pomocník. Můžu ti pomáhat s nápady, psaním příběhů, hrát hru nebo vymyslet motivační větu.`, 'jarvis');
+    return;
+  }
+
+  if(t.includes('vymysli příběh') || t.includes('vymysli pribeh') || t.includes('příběh')){
+    generateStory();
+    return;
+  }
+
+  if(t.includes('zahraj') || t.includes('hra') || t.includes('hru')){
+    playMiniGame();
+    return;
+  }
+
+  if(t.includes('pomoz') || t.includes('help') || t.includes('porad')){
+    appendMessage('Řekni mi s čím potřebuješ pomoct — školou, nápadem na příběh, nebo třeba receptem bez masa?', 'jarvis');
+    return;
+  }
+
+  if(t.includes('vtip') || t.includes('pobav') || t.includes('rozvesel')){
+    replyRandom(['Proč programátor nosí brýle? Protože nevidí C#! 🤓', 'Co udělá kniha v moři? - Plaveček! (lol)']);
+    return;
+  }
+
+  if(t.includes('diky') || t.includes('děkuju') || t.includes('díky')){
+    appendMessage('Rádo se stalo! Kdykoliv 😊', 'jarvis');
+    return;
+  }
+
+  // pokud nerozumí — nabídne možnosti
+  appendMessage('Hm… to jsem úplně nepochopil. Můžu:\n• vymyslet příběh\n• zahrát mini hru\n• vygenerovat hezkou zprávu\nNapiš např. "vymysli příběh" nebo "vtip".', 'jarvis');
+}
+
+// náhodná odpověď z pole
+function replyRandom(arr){ const r = arr[Math.floor(Math.random()*arr.length)]; appendMessage(r,'jarvis'); }
+
+// jednoduchý generator krátkého příběhu
+function generateStory(){
+  const starts = [
+    'Za městem leželo malé městečko, kde v noci tančily světlušky.',
+    'Na vrcholu hory stála dívka se stříbrnými vlasy a tajemným amuletem.',
+    'V hlubinách starého lesa se probudil starý stroj, který uměl vyprávět sny.'
+  ];
+  const middles = [
+    'Jednoho dne našla mapu, která ji zavedla k zapomenutému měsíčnímu jezeru.',
+    'Setkala se s moudrou sovou, která jí řekla, že v každém srdci je světlo.',
+    'Spolu se svými přáteli vytvořili plán, jak zachránit ztracené písně.'
+  ];
+  const ends = [
+    'A tak se stalo, že z malého činu vyrostl nový svět a oni se stali jeho strážci.',
+    'Nakonec našla domov tam, kde se smích a odvaha potkaly — a nikdy nezapomněla.',
+    'A i když cesta končila, začalo něco nového — dobrodružství, které nikdy nekončí.'
+  ];
+  const story = `${starts.random()} ${middles.random()} ${ends.random()}`;
+  appendMessage(story,'jarvis');
+}
+
+// mini hra: hádej číslo 1-10
+function playMiniGame(){
+  appendMessage('OK — hra: Hádej číslo od 1 do 10. Napiš číslo (pokus máš 3x).', 'jarvis');
+  startGuessingGame();
+}
+
+/* ---------------- HELPERS pro hru hádej číslo ---------------- */
+let guessing = false;
+let target = 0;
+let tries = 0;
+function startGuessingGame(){
+  guessing = true;
+  target = Math.floor(Math.random()*10)+1;
+  tries = 0;
+  // nasloucháme na globální vstup: při dalším odeslání zpracujeme hádání
+}
+
+function handleGuessAttempt(text){
+  if(!guessing) return false;
+  const n = parseInt(text.trim());
+  if(isNaN(n)) { appendMessage('Napiš prosím číslo mezi 1 a 10.', 'jarvis'); return true; }
+  tries++;
+  if(n === target){
+    appendMessage(`Super! Uhodla jsi číslo ${target} 🎉`, 'jarvis');
+    guessing = false;
+  } else if(tries >= 3){
+    appendMessage(`Uff, nevyšlo to — správné číslo bylo ${target}. Zkusme znovu později!`, 'jarvis');
+    guessing = false;
+  } else {
+    appendMessage(n < target ? 'Moc nízko — zkus větší číslo.' : 'Moc vysoko — zkus menší číslo.', 'jarvis');
+  }
+  return true;
+}
+
+/* ---------------- utility: náhodné volání ---------------- */
+Array.prototype.random = function(){ return this[Math.floor(Math.random()*this.length)]; };
+
+/* =============== UI eventy =============== */
+
+sendBtn.addEventListener('click', () => {
+  const text = inputEl.value;
+  inputEl.value = '';
+  // pokud hra aktivní -> zpracovat hádání
+  if(guessing){
+    const consumed = handleGuessAttempt(text);
+    if(!consumed) handleInput(text);
+  } else {
+    handleInput(text);
+  }
+});
+
+inputEl.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') sendBtn.click();
+});
+
+// clear / save buttons
+clearBtn.addEventListener('click', clearChat);
+saveBtn.addEventListener('click', saveChat);
+
+// toggle mluvení
+toggleSpeakBtn.addEventListener('click', ()=>{
+  speakEnabled = !speakEnabled;
+  toggleSpeakBtn.textContent = speakEnabled ? '🔇 Vypnout mluvení' : '🔊 Mluvit';
+});
+
+// jednoduché text-to-speech
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  if(!voice) initSpeech();
+  const u = new SpeechSynthesisUtterance(text);
+  if(voice) u.voice = voice;
+  u.lang = voice?.lang || 'cs-CZ';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+// při zavření uložíme
+window.addEventListener('beforeunload', saveChat);
+
+// načíst uložený chat
+loadChat();
+
+/* ---------- malé zlepšení: pokud uživatel napíše něco neznámého, Jarvis nabídne tipy ---------- */
+(function enhanceUnknownReply(){
+  const original = appendMessage;
+  // není potřeba přepisovat mnoho, už máme fallbacky v handleInput
+})();
+
+</script>
+</body>
+</html>
