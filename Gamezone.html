@@ -85,33 +85,6 @@ audio { display: none; }
     border-radius: 16px;
     cursor: pointer;
 }
-
-/* Parkour */
-#parkourGame {
-    position: relative;
-    width: 300px;
-    height: 150px;
-    background: #dff4ff;
-    margin: 0 auto;
-    overflow: hidden;
-    border-radius: 12px;
-}
-.player {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    background: #ff6ea8;
-    bottom: 0;
-    left: 20px;
-}
-.obstacle {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    background: #fff7c2;
-    bottom: 0;
-    right: -40px;
-}
 </style>
 </head>
 <body>
@@ -121,7 +94,6 @@ audio { display: none; }
     <button onclick="showGame('snake')">🐍 Snake</button>
     <button onclick="showGame('tictactoe')">❌⭕ Tic Tac Toe</button>
     <button onclick="showGame('clicker')">🖱️ Clicker</button>
-    <button onclick="showGame('parkour')">🏃‍♂️ Mini Parkour</button>
 
     <div id="musicControl">
         <button onclick="toggleMusic()">🔊 Zap/Vyp Hudbu</button>
@@ -149,15 +121,6 @@ audio { display: none; }
         <p>Počet kliků: <span id="clickCount">0</span></p>
         <button id="clickerButton">Klikni mě!</button>
     </div>
-
-    <!-- Parkour -->
-    <div id="parkour" class="game">
-        <h2>Mini Parkour 🏃‍♂️</h2>
-        <div id="parkourGame">
-            <div class="player" id="player"></div>
-        </div>
-        <p>Stiskni mezerník pro skok!</p>
-    </div>
 </div>
 
 <script>
@@ -182,7 +145,6 @@ const box = 20;
 let snake = [{x: 8*box, y: 8*box}];
 let dir;
 let food = {x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box};
-let score = 0;
 
 document.addEventListener("keydown",direction);
 function direction(event){
@@ -209,7 +171,6 @@ function drawSnake(){
     if(dir == "DOWN") snakeY += box;
 
     if(snakeX == food.x && snakeY == food.y){
-        score++;
         food = {x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box};
     } else {
         snake.pop();
@@ -218,10 +179,10 @@ function drawSnake(){
     let newHead = {x: snakeX, y: snakeY};
     for(let i=0;i<snake.length;i++){
         if(snake[i].x==newHead.x && snake[i].y==newHead.y){
-            snake = [{x:8*box,y:8*box}]; dir=null; score=0;
+            snake = [{x:8*box,y:8*box}]; dir=null;
         }
     }
-    if(snakeX<0 || snakeX>=canvas.width || snakeY<0 || snakeY>=canvas.height){snake=[{x:8*box,y:8*box}]; dir=null; score=0;}
+    if(snakeX<0 || snakeX>=canvas.width || snakeY<0 || snakeY>=canvas.height){snake=[{x:8*box,y:8*box}]; dir=null;}
     snake.unshift(newHead);
 }
 setInterval(drawSnake,150);
@@ -276,41 +237,7 @@ const clickDisplay = document.getElementById('clickCount');
 document.getElementById('clickerButton').addEventListener('click', ()=>{
     clicks++; clickDisplay.textContent = clicks;
 });
-
-// -------- Parkour --------
-const player = document.getElementById('player');
-const parkourGame = document.getElementById('parkourGame');
-let playerBottom = 0;
-let jump = false;
-let obstacles = [];
-
-document.addEventListener('keydown', (e)=>{
-    if(e.code==="Space" && !jump){ jump=true; let jumpHeight=0; const up = setInterval(()=>{
-        if(jumpHeight>=60){ clearInterval(up); const down = setInterval(()=>{
-            if(jumpHeight<=0){ clearInterval(down); jump=false; playerBottom=0; player.style.bottom=playerBottom+'px';}
-            else{jumpHeight-=5; playerBottom=jumpHeight; player.style.bottom=playerBottom+'px';}
-        },20);}
-        else{jumpHeight+=5; playerBottom=jumpHeight; player.style.bottom=playerBottom+'px';}
-    },20);}
-});
-
-function createObstacle(){
-    let obs = document.createElement('div');
-    obs.className='obstacle';
-    parkourGame.appendChild(obs);
-    obstacles.push({el: obs, pos: 300});
-}
-setInterval(()=>{
-    obstacles.forEach(o=>{
-        o.pos-=4;
-        o.el.style.right=o.pos+'px';
-        if(o.pos<-30){parkourGame.removeChild(o.el); obstacles.shift();}
-        if(o.pos<50 && o.pos>20 && playerBottom<30){ alert('Konec hry!'); obstacles.forEach(ob=>parkourGame.removeChild(ob.el)); obstacles=[]; playerBottom=0; player.style.bottom='0px';}
-    });
-},20);
-
-setInterval(()=>{ createObstacle(); },2000);
-
 </script>
 </body>
 </html>
+
