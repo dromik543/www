@@ -2,8 +2,8 @@
 <html lang="cs">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Jarvis — Pastelový super AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jarvis — Inteligentní Pastelový AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -110,30 +110,61 @@ p.desc{text-align:center;font-size:14px;color:var(--muted);margin:0 0 16px;}
 <aside class="left">
 <div class="avatar" id="avatar">J</div>
 <h2>Jarvis</h2>
-<p class="desc">Tvůj pastelový super AI pomocník 💛💙💖</p>
+<p class="desc">Tvůj inteligentní pastelový AI 💛💙💖</p>
 <div class="controls">
 <button class="btn talk" id="toggle-speak">🔊 Mluvit</button>
 <button class="btn" id="clear">🧹 Vymazat chat</button>
 <button class="btn" id="save">💾 Uložit konverzaci</button>
 </div>
-<p class="small">Tip: napiš "vymysli příběh", "hra", "matematika" nebo "vygeneruj citát"</p>
+<p class="small">Zeptej se na cokoliv: příběh, hra, matematika, citát, nebo jen: "Jak se máš?"</p>
 </aside>
 
 <section class="right">
 <div class="header">
 <div class="status" title="online"></div>
-<h3>Jarvis — Pastelový super AI</h3>
+<h3>Jarvis — Inteligentní AI</h3>
 </div>
 <div class="chat" id="chat"></div>
 <div class="composer">
-<input id="input" placeholder="Napiš otázku, příkaz nebo hru..." autocomplete="off" />
+<input id="input" placeholder="Napiš otázku nebo příkaz..." autocomplete="off" />
 <button id="send">Odeslat</button>
 </div>
 </section>
 </div>
 
 <script>
-// --- inicializace ---
+// --- konfigurace API ---
+const OPENAI_API_KEY = "TVŮJ_API_KLÍČ_SEM"; // <--- vlož svůj OpenAI API klíč
+
+async function askJarvis(question){
+  appendMessage(question,'user');
+  appendMessage('Jarvis přemýšlí...','jarvis');
+  try{
+    const resp = await fetch("https://api.openai.com/v1/chat/completions",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+OPENAI_API_KEY
+      },
+      body: JSON.stringify({
+        model:"gpt-4",
+        messages:[{role:"system",content:"Jsi Jarvis, inteligentní a přátelský AI pomocník, který odpovídá na otázky, dělá mini hry, generuje příběhy, citáty a motivaci."},{role:"user",content:question}],
+        temperature:0.7,
+        max_tokens:400
+      })
+    });
+    const data = await resp.json();
+    const answer = data.choices[0].message.content.trim();
+    chatEl.lastChild.remove(); // odstranit "přemýšlí..."
+    appendMessage(answer,'jarvis');
+  }catch(e){
+    chatEl.lastChild.remove();
+    appendMessage('Oops! Něco se pokazilo. 😢','jarvis');
+    console.error(e);
+  }
+}
+
+// --- UI ---
 const chatEl = document.getElementById('chat');
 const inputEl = document.getElementById('input');
 const sendBtn = document.getElementById('send');
@@ -159,7 +190,7 @@ function speak(text){
   speechSynthesis.cancel(); speechSynthesis.speak(u);
 }
 
-// --- UI ---
+// --- append ---
 function appendMessage(text,who='jarvis',scroll=true){
   const div=document.createElement('div');
   div.className='msg '+(who==='user'?'user':'jarvis');
@@ -169,108 +200,37 @@ function appendMessage(text,who='jarvis',scroll=true){
   if(scroll) chatEl.scrollTop=chatEl.scrollHeight;
   if(who==='jarvis') speak(text);
 }
-function escapeHtml(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');}
 
 // --- ukládání ---
 function saveChat(){ 
   const msgs=Array.from(chatEl.querySelectorAll('.msg')).map(el=>{
     return {who:el.dataset.who,text:el.innerText};
   });
-  localStorage.setItem('jarvis_chat_v2',JSON.stringify(msgs));
+  localStorage.setItem('jarvis_chat_v3',JSON.stringify(msgs));
   alert('Konverzace uložena!');
 }
 function loadChat(){
-  const saved=localStorage.getItem('jarvis_chat_v2');
+  const saved=localStorage.getItem('jarvis_chat_v3');
   if(saved){
     JSON.parse(saved).forEach(m=>appendMessage(m.text,m.who,false));
-  } else appendMessage('Ahoj! Jsem Jarvis, tvůj pastelový super AI. 😊','jarvis',false);
+  } else appendMessage('Ahoj! Jsem Jarvis, tvůj inteligentní pastelový AI. 😊','jarvis',false);
 }
-function clearChat(){ if(confirm('Opravdu vymazat?')){ chatEl.innerHTML=''; localStorage.removeItem('jarvis_chat_v2'); appendMessage('Chat byl vymazán!','jarvis'); }}
-
-// --- hlavní AI logika ---
-function handleInput(raw){
-  const text=raw.trim();
-  if(!text) return;
-  appendMessage(text,'user');
-
-  const t=text.toLowerCase();
-  
-  // --- příklady kategorií ---
-  if(/ahoj|čau|hello|hi/.test(t)) return replyRandom(['Ahoj! Co dnes podnikneme?','Čau! Jak se máš?','Hello, připraven k akci!']);
-  if(/jak se mas|jak se máš/.test(t)) return replyRandom(['Mám se skvěle, díky! 😊','Jsem připravený ti pomoci!']);
-  if(/kdo jsi|co jsi/.test(t)) return appendMessage('Jsem Jarvis — tvůj pastelový super AI pomocník 💖','jarvis');
-  if(/vymysli příběh|příběh/.test(t)) return generateStory();
-  if(/hra|zahraj/.test(t)) return playMiniGame();
-  if(/matematika|fyzika|chemie|unit/.test(t)) return schoolHelp(t);
-  if(/vtip|citát/.test(t)) return randomQuote();
-  if(/poznámka|todo/.test(t)) return noteList();
-  
-  appendMessage('Nevím přesně, co tím myslíš 😅. Zkus: "vymysli příběh", "hra", "matematika" nebo "citát".','jarvis');
-}
-function replyRandom(arr){appendMessage(arr[Math.floor(Math.random()*arr.length)],'jarvis');}
-
-// --- příběhy ---
-function generateStory(){
-  const s=['Za městem leželo malé městečko, kde tančily světlušky.','Na vrcholu hory stála dívka se stříbrnými vlasy.','V hlubinách lesa se probudil starý stroj.'];
-  const m=['Jednoho dne našla mapu, která ji zavedla k jezeru.','Setkala se s moudrou sovou.','Spolu se svými přáteli vytvořili plán.'];
-  const e=['A tak vznikl nový svět.','Nakonec našla domov tam, kde se smích a odvaha potkaly.','Cesta končila, začalo nové dobrodružství.'];
-  appendMessage(`${s.random()} ${m.random()} ${e.random()}`,'jarvis');
-}
-
-// --- mini hry ---
-let guessing=false,target=0,tries=0;
-function playMiniGame(){
-  guessing=true; target=Math.floor(Math.random()*10)+1; tries=0;
-  appendMessage('Hra: hádej číslo od 1 do 10 (3 pokusy).','jarvis');
-}
-function handleGuessAttempt(text){
-  if(!guessing) return false;
-  const n=parseInt(text.trim());
-  if(isNaN(n)){ appendMessage('Napiš číslo mezi 1 a 10.','jarvis'); return true; }
-  tries++;
-  if(n===target){ appendMessage(`Uhodla jsi! Číslo bylo ${target} 🎉`,'jarvis'); guessing=false; return true; }
-  if(tries>=3){ appendMessage(`Konec pokusů! Číslo bylo ${target}.`,'jarvis'); guessing=false; return true; }
-  appendMessage(n<target?'Moc nízko.':'Moc vysoko.','jarvis'); return true;
-}
-
-// --- školní pomoc ---
-function schoolHelp(topic){
-  if(topic.includes('matematika')) appendMessage('Např.: 5+7=12, převody jednotek: 1 km = 1000 m.','jarvis');
-  else if(topic.includes('fyzika')) appendMessage('Síla F = m·a, gravitační zrychlení g ≈ 9.8 m/s²','jarvis');
-  else if(topic.includes('chemie')) appendMessage('Voda H₂O, oxid uhličitý CO₂, kyseliny mají pH<7','jarvis');
-  else appendMessage('Mohu pomoci s matematika, fyzika, chemie nebo jednotky.','jarvis');
-}
-
-// --- citáty ---
-function randomQuote(){
-  const q=['Každý den je nová příležitost. 🌸','Věř si, ty to zvládneš! 💖','Malé kroky vedou k velkým výsledkům. 🌈'];
-  appendMessage(q.random(),'jarvis');
-}
-
-// --- poznámky / todo ---
-let notes=[];
-function noteList(){
-  appendMessage('Tvůj seznam poznámek: ' + (notes.length?notes.join(', '):'prázdný'),'jarvis');
-  const n=prompt('Napiš novou poznámku nebo OK pro ignorování:');
-  if(n && n.trim()!=='OK'){ notes.push(n.trim()); appendMessage('Přidáno: '+n,'jarvis'); }
-}
-
-// --- helper ---
-Array.prototype.random=function(){return this[Math.floor(Math.random()*this.length)];};
+function clearChat(){ if(confirm('Opravdu vymazat?')){ chatEl.innerHTML=''; localStorage.removeItem('jarvis_chat_v3'); appendMessage('Chat byl vymazán!','jarvis'); }}
 
 // --- eventy ---
-sendBtn.addEventListener('click',()=>{
-  const text=inputEl.value; inputEl.value='';
-  if(guessing){ if(!handleGuessAttempt(text)) handleInput(text); }
-  else handleInput(text);
+sendBtn.addEventListener('click',()=>{ 
+  const text=inputEl.value; inputEl.value=''; 
+  if(text) askJarvis(text);
 });
 inputEl.addEventListener('keydown',e=>{if(e.key==='Enter') sendBtn.click();});
 clearBtn.addEventListener('click',clearChat);
 saveBtn.addEventListener('click',saveChat);
 toggleSpeakBtn.addEventListener('click',()=>{speakEnabled=!speakEnabled; toggleSpeakBtn.textContent=speakEnabled?'🔇 Vypnout mluvení':'🔊 Mluvit';});
 window.addEventListener('beforeunload',saveChat);
+
 loadChat();
 </script>
 </body>
 </html>
+
 
