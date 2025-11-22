@@ -63,9 +63,7 @@ audio { display: none; }
     border-radius: 12px;
     transition: transform 0.2s;
 }
-#snakeCanvas:hover {
-    transform: scale(1.05);
-}
+#snakeCanvas:hover { transform: scale(1.05); }
 
 /* Tic Tac Toe */
 .ttt-grid {
@@ -92,7 +90,7 @@ audio { display: none; }
 }
 
 /* Clicker */
-#clickerButton {
+#clickerButton, #resetClicker {
     padding: 20px 40px;
     font-size: 24px;
     background: #fff7c2;
@@ -100,7 +98,7 @@ audio { display: none; }
     cursor: pointer;
     transition: transform 0.2s;
 }
-#clickerButton:hover { transform: scale(1.1);}
+#clickerButton:hover, #resetClicker:hover { transform: scale(1.1);}
 #timer { font-weight: bold; margin-top: 10px; font-size: 18px; }
 </style>
 </head>
@@ -123,6 +121,7 @@ audio { display: none; }
     <div id="snake" class="game">
         <h2>Snake 🐍</h2>
         <canvas id="snakeCanvas" width="300" height="300"></canvas>
+        <p>Skóre: <span id="snakeScore">0</span> | Rekord: <span id="snakeHigh">0</span></p>
     </div>
 
     <!-- Tic Tac Toe -->
@@ -130,6 +129,7 @@ audio { display: none; }
         <h2>Tic Tac Toe ❌⭕</h2>
         <div class="ttt-grid" id="tttGrid"></div>
         <p id="tttResult"></p>
+        <p>Tvůj rekord výher: <span id="tttHigh">0</span></p>
     </div>
 
     <!-- Clicker -->
@@ -138,6 +138,8 @@ audio { display: none; }
         <p>Počet kliků: <span id="clickCount">0</span></p>
         <button id="clickerButton">Klikni mě!</button>
         <p id="timer">Čas: 10s</p>
+        <button id="resetClicker">🔄 Reset</button>
+        <p>Osobní rekord: <span id="clickHigh">0</span></p>
     </div>
 </div>
 
@@ -163,6 +165,9 @@ const box = 20;
 let snake = [{x: 8*box, y: 8*box}];
 let dir;
 let food = {x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box};
+let snakeScore = 0;
+let snakeHigh = 0;
+
 document.addEventListener("keydown",direction);
 function direction(event){
     if(event.keyCode == 37 && dir != "RIGHT") dir = "LEFT";
@@ -170,6 +175,7 @@ function direction(event){
     else if(event.keyCode == 39 && dir != "LEFT") dir = "RIGHT";
     else if(event.keyCode == 40 && dir != "UP") dir = "DOWN";
 }
+
 function drawSnake(){
     ctx.fillStyle = "#fff7c2";
     ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -188,24 +194,35 @@ function drawSnake(){
 
     if(snakeX == food.x && snakeY == food.y){
         food = {x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box};
+        snakeScore++;
+        document.getElementById('snakeScore').textContent = snakeScore;
+        if(snakeScore>snakeHigh){snakeHigh=snakeScore; document.getElementById('snakeHigh').textContent=snakeHigh;}
     } else { snake.pop(); }
 
     let newHead = {x: snakeX, y: snakeY};
     for(let i=0;i<snake.length;i++){
         if(snake[i].x==newHead.x && snake[i].y==newHead.y){
-            snake = [{x:8*box,y:8*box}]; dir=null;
+            resetSnake();
         }
     }
-    if(snakeX<0 || snakeX>=canvas.width || snakeY<0 || snakeY>=canvas.height){snake=[{x:8*box,y:8*box}]; dir=null;}
+    if(snakeX<0 || snakeX>=canvas.width || snakeY<0 || snakeY>=canvas.height){ resetSnake(); }
     snake.unshift(newHead);
 }
+
+function resetSnake(){
+    snake = [{x:8*box,y:8*box}]; dir=null; snakeScore=0; document.getElementById('snakeScore').textContent=snakeScore;
+}
+
 setInterval(drawSnake,150);
 
 // -------- Tic Tac Toe --------
 const tttGrid = document.getElementById('tttGrid');
 const tttResult = document.getElementById('tttResult');
+const tttHighDisplay = document.getElementById('tttHigh');
 let tttBoard = ["","","","","","","","",""];
 let tttTurn = "X";
+let tttHigh = 0;
+
 function createTTT(){
     tttGrid.innerHTML = "";
     for(let i=0;i<9;i++){
@@ -237,6 +254,7 @@ function checkTTT(){
         if(tttBoard[a] && tttBoard[a]===tttBoard[b] && tttBoard[a]===tttBoard[c]){
             tttResult.textContent = tttBoard[a]+" vyhrává!";
             tttBoard = ["","","","","","","","",""];
+            if(++tttHigh > parseInt(tttHighDisplay.textContent)) tttHighDisplay.textContent = tttHigh;
             setTimeout(()=>{tttResult.textContent=""; createTTT();},2000);
             return;
         }
@@ -244,24 +262,32 @@ function checkTTT(){
 }
 createTTT();
 
-// -------- Clicker s časem --------
+// -------- Clicker s časem a rekordem --------
 let clicks = 0;
 let clickTime = 10;
+let timerInterval = null;
+let clickHigh = 0;
 const clickDisplay = document.getElementById('clickCount');
 const timerDisplay = document.getElementById('timer');
+const highScoreDisplay = document.getElementById('clickHigh');
 const clickBtn = document.getElementById('clickerButton');
+const resetBtn = document.getElementById('resetClicker');
 
 function startClicker(){
-    clicks = 0;
     clickTime = 10;
-    clickDisplay.textContent = clicks;
     timerDisplay.textContent = "Čas: "+clickTime+"s";
-    const interval = setInterval(()=>{
+    clearInterval(timerInterval);
+    timerInterval = setInterval(()=>{
         clickTime--;
         timerDisplay.textContent = "Čas: "+clickTime+"s";
         if(clickTime<=0){
-            clearInterval(interval);
+            clearInterval(timerInterval);
             alert("Konec! Tvoje skóre: "+clicks);
+            if(clicks > clickHigh){
+                clickHigh = clicks;
+                highScoreDisplay.textContent = clickHigh;
+            }
+            timerInterval = null;
         }
     },1000);
 }
@@ -269,8 +295,19 @@ function startClicker(){
 clickBtn.addEventListener('click', ()=>{
     clicks++;
     clickDisplay.textContent = clicks;
-    if(clickTime===10){ startClicker(); } // spustí čas při prvním kliknutí
+    if(clickTime===10 && timerInterval===null){ startClicker(); } // spustí čas při prvním kliknutí
+});
+
+// Reset tlačítko
+resetBtn.addEventListener('click', ()=>{
+    clicks = 0;
+    clickTime = 10;
+    clickDisplay.textContent = clicks;
+    timerDisplay.textContent = "Čas: 10s";
+    clearInterval(timerInterval);
+    timerInterval = null;
 });
 </script>
 </body>
 </html>
+
