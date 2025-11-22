@@ -49,12 +49,19 @@ button:hover { transform: scale(1.05); }
     background: #ffd6e8;
     color: #333;
     font-weight: 500;
-    min-height: 100px;
+    min-height: 120px;
     text-align: left;
 }
 .category {
     font-weight: 700;
     margin-top: 10px;
+    display:flex;
+    align-items:center;
+}
+.category img {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
 }
 </style>
 </head>
@@ -89,23 +96,33 @@ button:hover { transform: scale(1.05); }
 </div>
 
 <script>
+// horoskopy s více možnostmi
 const horoscopes = {
     "Beran": {
-        love: ["Dnes je vhodný čas pro romantická gesta.", "Komunikace s partnerem bude hladká a upřímná.", "Možná setkáš někoho zajímavého."],
-        work: ["Tvá iniciativa na pracovišti bude oceněna.", "Dnes se může objevit nová příležitost.", "Buď připravený na změny v projektu."],
-        health: ["Dnes se soustřeď na relaxaci a dechová cvičení.", "Nezapomínej na dostatek vody.", "Krátká procházka ti dodá energii."]
+        love: ["Dnes je vhodný čas pro romantická gesta.", "Komunikace s partnerem bude hladká.", "Možná setkáš někoho zajímavého."],
+        work: ["Tvá iniciativa bude oceněna.", "Objeví se nová příležitost.", "Buď připraven na změny."],
+        health: ["Soustřeď se na relaxaci.", "Nepřetěžuj se.", "Krátká procházka ti dodá energii."]
     },
     "Býk": {
-        love: ["Trpělivost dnes přinese harmonii ve vztazích.", "Dopřej si romantický večer.", "Dnes je dobrý den pro hluboký rozhovor."],
-        work: ["Tvá pečlivost se vyplatí.", "Může přijít nabídka, kterou je třeba zvážit.", "Organizace bude klíč k úspěchu."],
-        health: ["Zaměř se na vyváženou stravu.", "Nepřetěžuj se fyzicky.", "Odpolední klid ti pomůže dobít energii."]
+        love: ["Trpělivost dnes přinese harmonii.", "Dopřej si romantický večer.", "Dnes je vhodný hluboký rozhovor."],
+        work: ["Pečlivost se vyplatí.", "Může přijít nabídka k zvážení.", "Organizace bude klíč."],
+        health: ["Zaměř se na vyváženou stravu.", "Nepřetěžuj se fyzicky.", "Odpolední klid ti pomůže."]
     },
     "Blíženci": {
-        love: ["Dnes komunikace přinese nové nápady ve vztahu.", "Ujisti se, že posloucháš svého partnera.", "Setkání může přinést překvapení."],
-        work: ["Tvůj nápad dnes zazáří.", "Buď otevřený spolupráci.", "Komunikace s kolegy bude hladká."],
-        health: ["Dopřej si dostatek spánku.", "Krátké cvičení pomůže uvolnit napětí.", "Relaxuj s knihou nebo hudbou."]
+        love: ["Komunikace přinese nové nápady.", "Poslouchej partnera.", "Setkání může přinést překvapení."],
+        work: ["Tvůj nápad zazáří.", "Buď otevřený spolupráci.", "Komunikace s kolegy bude hladká."],
+        health: ["Dopřej si spánek.", "Krátké cvičení uvolní napětí.", "Relaxuj s knihou nebo hudbou."]
     },
-    // ... sem můžeš přidat další znamení se stejnou strukturou
+
+
+    // ... přidej další znamení stejně
+};
+
+// ikony pro kategorie
+const categoryIcons = {
+    love: "https://img.icons8.com/emoji/48/000000/heart-emoji.png",
+    work: "https://img.icons8.com/emoji/48/000000/briefcase-emoji.png",
+    health: "https://img.icons8.com/emoji/48/000000/herb-emoji.png"
 };
 
 function generateHoroscope(){
@@ -116,21 +133,28 @@ function generateHoroscope(){
 
     if(!sign){ alert("Vyber své znamení!"); return; }
     const categories = horoscopes[sign];
-    
+
     if(cat==="all"){
         for(let c in categories){
             const arr = categories[c];
             const random = arr[Math.floor(Math.random()*arr.length)];
             const div = document.createElement('div');
-            div.innerHTML = `<span class="category">${c.charAt(0).toUpperCase()+c.slice(1)}:</span> ${random}`;
+            div.innerHTML = `<span class="category"><img src="${categoryIcons[c]}" alt="${c}"> ${c.charAt(0).toUpperCase()+c.slice(1)}:</span> ${random}`;
             display.appendChild(div);
         }
     } else {
         const arr = categories[cat];
         const random = arr[Math.floor(Math.random()*arr.length)];
-        display.innerHTML = `<span class="category">${cat.charAt(0).toUpperCase()+cat.slice(1)}:</span> ${random}`;
+        display.innerHTML = `<span class="category"><img src="${categoryIcons[cat]}" alt="${cat}"> ${cat.charAt(0).toUpperCase()+cat.slice(1)}:</span> ${random}`;
     }
 }
+
+// automatické generování horoskopu při načtení stránky
+window.addEventListener('load', ()=>{
+    document.getElementById('sign').value = "Beran"; // výchozí znamení
+    generateHoroscope();
+});
 </script>
 </body>
 </html>
+
