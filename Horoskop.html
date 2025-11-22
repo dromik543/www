@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pastelový Denní Horoskop s Kategoriemi</title>
+<title>Pastelový Denní Horoskop</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
 body {
@@ -20,7 +20,7 @@ body {
     border-radius: 24px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     padding: 30px;
-    max-width: 450px;
+    max-width: 500px;
     width: 100%;
     text-align: center;
 }
@@ -49,7 +49,7 @@ button:hover { transform: scale(1.05); }
     background: #ffd6e8;
     color: #333;
     font-weight: 500;
-    min-height: 120px;
+    min-height: 150px;
     text-align: left;
 }
 .category {
@@ -96,7 +96,6 @@ button:hover { transform: scale(1.05); }
 </div>
 
 <script>
-// horoskopy s více možnostmi
 const horoscopes = {
     "Beran": {
         love: ["Dnes je vhodný čas pro romantická gesta.", "Komunikace s partnerem bude hladká.", "Možná setkáš někoho zajímavého."],
@@ -113,12 +112,53 @@ const horoscopes = {
         work: ["Tvůj nápad zazáří.", "Buď otevřený spolupráci.", "Komunikace s kolegy bude hladká."],
         health: ["Dopřej si spánek.", "Krátké cvičení uvolní napětí.", "Relaxuj s knihou nebo hudbou."]
     },
-
-
-    // ... přidej další znamení stejně
+    "Rak": {
+        love: ["Rodina a přátelé dnes přinesou radost.", "Pečuj o své vztahy.", "Romantický večer potěší srdce."],
+        work: ["Dnes se soustřeď na týmovou práci.", "Nepodceňuj detaily.", "Buď připraven na nové úkoly."],
+        health: ["Dopřej si klidný večer.", "Meditace pomůže uvolnit stres.", "Nepřetěžuj se fyzicky."]
+    },
+    "Lev": {
+        love: ["Tvá sebevědomí dnes rozzáří okolí.", "Neboj se ukázat svůj talent.", "Romantická setkání potěší."],
+        work: ["Leadership bude oceněn.", "Nové projekty přinesou výzvy.", "Buď aktivní a kreativní."],
+        health: ["Dnes se zaměř na energii a pohyb.", "Krátká procházka ti dodá sílu.", "Relaxuj po práci."]
+    },
+    "Panna": {
+        love: ["Dnes je vhodný den na upřímný rozhovor.", "Pečlivost ve vztazích přinese harmonii.", "Neboj se projevit city."],
+        work: ["Organizace a plánování ti pomohou.", "Buď pečlivý, odměna přijde.", "Dnes se zaměř na detail."],
+        health: ["Udržuj rovnováhu mezi prací a odpočinkem.", "Krátká meditace pomůže.", "Zdravá strava je klíč."]
+    },
+    "Váhy": {
+        love: ["Hledání rovnováhy dnes přinese harmonii.", "Společenské setkání přinese radost.", "Dopřej si chvíle s partnerem."],
+        work: ["Komunikace s kolegy bude hladká.", "Dnes se objeví nové kontakty.", "Spolupráce přinese úspěch."],
+        health: ["Dopřej si odpočinek.", "Krátká relaxace u knihy ti pomůže.", "Zdravá strava tě podpoří."]
+    },
+    "Štír": {
+        love: ["Intenzivní den plný emocí.", "Využij intuici ve vztazích.", "Neboj se vyjádřit city."],
+        work: ["Soustřeď se na cíle.", "Dnes může přijít výzva, kterou zvládneš.", "Tvá iniciativa bude oceněna."],
+        health: ["Odpočinek pomůže regenerovat energii.", "Meditace sníží stres.", "Dbej na pitný režim."]
+    },
+    "Střelec": {
+        love: ["Dobrodružství čeká! Připrav se na nové zážitky.", "Otevřenost přinese nové vztahy.", "Romantika potěší srdce."],
+        work: ["Nové zkušenosti přinesou inspiraci.", "Buď otevřený novým nápadům.", "Dnes se uč něco nového."],
+        health: ["Krátká aktivita venku ti dodá energii.", "Relaxuj po práci.", "Nepodceňuj odpočinek."]
+    },
+    "Kozoroh": {
+        love: ["Pracovitost a trpělivost se vyplatí.", "Připrav se na stabilní vztahy.", "Dnes projev city upřímně."],
+        work: ["Stanov si priority a drž se plánu.", "Tvá pečlivost bude oceněna.", "Nové úkoly zvládneš s lehkostí."],
+        health: ["Dbej na fyzickou kondici.", "Krátké cvičení ti pomůže.", "Relaxace sníží napětí."]
+    },
+    "Vodnář": {
+        love: ["Kreativita a originalita přinesou radost.", "Sdílej své myšlenky s partnerem.", "Možná nové přátelské setkání."],
+        work: ["Nové nápady budou oceněny.", "Neboj se experimentovat.", "Dnes můžeš inspirovat ostatní."],
+        health: ["Dej prostor fantazii.", "Krátká meditace pro uvolnění.", "Zdravá strava tě podpoří."]
+    },
+    "Ryby": {
+        love: ["Intuice tě dnes povede ve vztazích.", "Dopřej si romantické chvíle.", "Setkání s blízkými potěší."],
+        work: ["Tvá kreativita se projeví.", "Dnes můžeš přijít s novým řešením.", "Spolupráce bude harmonická."],
+        health: ["Relaxuj a věnuj se svým zálibám.", "Nepodceňuj odpočinek.", "Krátká procházka ti dodá energii."]
+    }
 };
 
-// ikony pro kategorie
 const categoryIcons = {
     love: "https://img.icons8.com/emoji/48/000000/heart-emoji.png",
     work: "https://img.icons8.com/emoji/48/000000/briefcase-emoji.png",
@@ -149,12 +189,13 @@ function generateHoroscope(){
     }
 }
 
-// automatické generování horoskopu při načtení stránky
+// automatické generování při načtení stránky
 window.addEventListener('load', ()=>{
-    document.getElementById('sign').value = "Beran"; // výchozí znamení
+    document.getElementById('sign').value = "Beran";
     generateHoroscope();
 });
 </script>
 </body>
 </html>
+
 
