@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pastelová Herní Zóna</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ffd6e8, #dff4ff, #fff7c2);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.container {
+    background: rgba(255,255,255,0.9);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 20px;
+    max-width: 700px;
+    width: 95%;
+    text-align: center;
+}
+h1 {
+    color: #ff6ea8;
+    margin-bottom: 15px;
+}
+button {
+    padding: 12px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    background: #dff4ff;
+}
+button:hover { transform: scale(1.05); }
+#musicControl { margin-top: 10px; }
+audio { display: none; }
+
+/* Hry */
+.game {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 16px;
+    background: #ffd6e8;
+}
+
+/* Snake */
+#snakeCanvas {
+    background: #fff7c2;
+    border-radius: 12px;
+}
+
+/* Tic Tac Toe */
+.ttt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 80px);
+    grid-template-rows: repeat(3, 80px);
+    gap: 5px;
+    justify-content: center;
+    margin-top: 15px;
+}
+.ttt-cell {
+    background: #dff4ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+/* Clicker */
+#clickerButton {
+    padding: 20px 40px;
+    font-size: 24px;
+    background: #fff7c2;
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+/* Parkour */
+#parkourGame {
+    position: relative;
+    width: 300px;
+    height: 150px;
+    background: #dff4ff;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 12px;
+}
+.player {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: #ff6ea8;
+    bottom: 0;
+    left: 20px;
+}
+.obstacle {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: #fff7c2;
+    bottom: 0;
+    right: -40px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>🎮 Pastelová Herní Zóna</h1>
+
+    <button onclick="showGame('snake')">🐍 Snake</button>
+    <button onclick="showGame('tictactoe')">❌⭕ Tic Tac Toe</button>
+    <button onclick="showGame('clicker')">🖱️ Clicker</button>
+    <button onclick="showGame('parkour')">🏃‍♂️ Mini Parkour</button>
+
+    <div id="musicControl">
+        <button onclick="toggleMusic()">🔊 Zap/Vyp Hudbu</button>
+        <audio id="bgMusic" loop>
+            <source src="https://www.bensound.com/bensound-music/bensound-sunny.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- Snake -->
+    <div id="snake" class="game">
+        <h2>Snake 🐍</h2>
+        <canvas id="snakeCanvas" width="300" height="300"></canvas>
+    </div>
+
+    <!-- Tic Tac Toe -->
+    <div id="tictactoe" class="game">
+        <h2>Tic Tac Toe ❌⭕</h2>
+        <div class="ttt-grid" id="tttGrid"></div>
+        <p id="tttResult"></p>
+    </div>
+
+    <!-- Clicker -->
+    <div id="clicker" class="game">
+        <h2>Clicker 🖱️</h2>
+        <p>Počet kliků: <span id="clickCount">0</span></p>
+        <button id="clickerButton">Klikni mě!</button>
+    </div>
+
+    <!-- Parkour -->
+    <div id="parkour" class="game">
+        <h2>Mini Parkour 🏃‍♂️</h2>
+        <div id="parkourGame">
+            <div class="player" id="player"></div>
+        </div>
+        <p>Stiskni mezerník pro skok!</p>
+    </div>
+</div>
+
+<script>
+// Hudba
+const music = document.getElementById('bgMusic');
+let musicPlaying = false;
+function toggleMusic() {
+    if(musicPlaying){ music.pause(); musicPlaying = false; } 
+    else { music.play(); musicPlaying = true; }
+}
+
+// Přepínání her
+function showGame(game){
+    document.querySelectorAll('.game').forEach(g => g.style.display = 'none');
+    document.getElementById(game).style.display = 'block';
+}
+
+// -------- Snake --------
+const canvas = document.getElementById('snakeCanvas');
+const ctx = canvas.getContext('2d');
+const box = 20;
+let snake = [{x: 8*box, y: 8*box}];
+let dir;
+let food = {x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box};
+let score = 0;
+
+document.addEventListener("keydown",direction);
+function direction(event){
+    if(event.keyCode == 37 && dir != "RIGHT") dir = "LEFT";
+    else if(event.keyCode == 38 && dir != "DOWN") dir = "UP";
+    else if(event.keyCode == 39 && dir != "LEFT") dir = "RIGHT";
+    else if(event.keyCode == 40 && dir != "UP") dir = "DOWN";
+}
+
+function drawSnake(){
+    ctx.fillStyle = "#fff7c2";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    for(let i=0;i<snake.length;i++){
+        ctx.fillStyle = "#ff6ea8";
+        ctx.fillRect(snake[i].x,snake[i].y,box,box);
+    }
+    ctx.fillStyle = "#dff4ff";
+    ctx.fillRect(food.x, food.y, box, box);
+    let snakeX = snake[0].x;
+    let snakeY = snake[0].y;
+    if(dir == "LEFT") snakeX -= box;
+    if(dir == "RIGHT") snakeX += box;
+    if(dir == "UP") snakeY -= box;
+    if(dir == "DOWN") snakeY += box;
+
+    if(snakeX == food.x && snakeY == food.y){
+        score++;
+        food = {x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box};
+    } else {
+        snake.pop();
+    }
+
+    let newHead = {x: snakeX, y: snakeY};
+    for(let i=0;i<snake.length;i++){
+        if(snake[i].x==newHead.x && snake[i].y==newHead.y){
+            snake = [{x:8*box,y:8*box}]; dir=null; score=0;
+        }
+    }
+    if(snakeX<0 || snakeX>=canvas.width || snakeY<0 || snakeY>=canvas.height){snake=[{x:8*box,y:8*box}]; dir=null; score=0;}
+    snake.unshift(newHead);
+}
+setInterval(drawSnake,150);
+
+// -------- Tic Tac Toe --------
+const tttGrid = document.getElementById('tttGrid');
+const tttResult = document.getElementById('tttResult');
+let tttBoard = ["","","","","","","","",""];
+let tttTurn = "X";
+
+function createTTT(){
+    tttGrid.innerHTML = "";
+    for(let i=0;i<9;i++){
+        let cell = document.createElement('div');
+        cell.className = 'ttt-cell';
+        cell.dataset.index = i;
+        cell.addEventListener('click', tttClick);
+        cell.textContent = tttBoard[i];
+        tttGrid.appendChild(cell);
+    }
+}
+function tttClick(e){
+    const idx = e.target.dataset.index;
+    if(tttBoard[idx]===""){
+        tttBoard[idx]=tttTurn;
+        tttTurn = tttTurn==="X"?"O":"X";
+        createTTT();
+        checkTTT();
+    }
+}
+function checkTTT(){
+    const wins = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ];
+    for(const w of wins){
+        const [a,b,c] = w;
+        if(tttBoard[a] && tttBoard[a]===tttBoard[b] && tttBoard[a]===tttBoard[c]){
+            tttResult.textContent = tttBoard[a]+" vyhrává!";
+            tttBoard = ["","","","","","","","",""];
+            setTimeout(()=>{tttResult.textContent=""; createTTT();},2000);
+            return;
+        }
+    }
+}
+createTTT();
+
+// -------- Clicker --------
+let clicks = 0;
+const clickDisplay = document.getElementById('clickCount');
+document.getElementById('clickerButton').addEventListener('click', ()=>{
+    clicks++; clickDisplay.textContent = clicks;
+});
+
+// -------- Parkour --------
+const player = document.getElementById('player');
+const parkourGame = document.getElementById('parkourGame');
+let playerBottom = 0;
+let jump = false;
+let obstacles = [];
+
+document.addEventListener('keydown', (e)=>{
+    if(e.code==="Space" && !jump){ jump=true; let jumpHeight=0; const up = setInterval(()=>{
+        if(jumpHeight>=60){ clearInterval(up); const down = setInterval(()=>{
+            if(jumpHeight<=0){ clearInterval(down); jump=false; playerBottom=0; player.style.bottom=playerBottom+'px';}
+            else{jumpHeight-=5; playerBottom=jumpHeight; player.style.bottom=playerBottom+'px';}
+        },20);}
+        else{jumpHeight+=5; playerBottom=jumpHeight; player.style.bottom=playerBottom+'px';}
+    },20);}
+});
+
+function createObstacle(){
+    let obs = document.createElement('div');
+    obs.className='obstacle';
+    parkourGame.appendChild(obs);
+    obstacles.push({el: obs, pos: 300});
+}
+setInterval(()=>{
+    obstacles.forEach(o=>{
+        o.pos-=4;
+        o.el.style.right=o.pos+'px';
+        if(o.pos<-30){parkourGame.removeChild(o.el); obstacles.shift();}
+        if(o.pos<50 && o.pos>20 && playerBottom<30){ alert('Konec hry!'); obstacles.forEach(ob=>parkourGame.removeChild(ob.el)); obstacles=[]; playerBottom=0; player.style.bottom='0px';}
+    });
+},20);
+
+setInterval(()=>{ createObstacle(); },2000);
+
+</script>
+</body>
+</html>
