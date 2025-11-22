@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pastelová Webová Stránka</title>
+  <style>
+    :root {
+      --pink: #ffd6e8;
+      --blue: #d6ecff;
+      --yellow: #fff6c7;
+      --text: #333;
+      --radius: 20px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(160deg, var(--pink), var(--blue), var(--yellow));
+      background-size: 400% 400%;
+      animation: gradientMove 18s ease infinite;
+      color: var(--text);
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      width: 100%;
+      padding: 20px 0;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid rgba(0,0,0,0.05);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 600;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 25px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .card {
+      padding: 20px;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 25px;
+      border-radius: var(--radius);
+      background: var(--pink);
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: var(--yellow);
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Moje Pastelová Stránka</h1>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>Vítej!</h2>
+      <p>Toto je základní pastelový design webové stránky. Můžeš si sem pak doplnit cokoliv — texty, obrázky, menu nebo sekce s příběhy.</p>
+      
+    </div>
+  </main>
+</body>
+</html>
