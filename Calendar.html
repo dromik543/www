@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pastelový Kalendář</title>
+<title>Pastelový Kalendář s Událostmi</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
 body {
@@ -20,7 +20,7 @@ body {
     border-radius: 24px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     padding: 20px;
-    max-width: 480px;
+    max-width: 500px;
     width: 100%;
 }
 .header {
@@ -47,11 +47,8 @@ body {
     text-align: center;
     margin-bottom: 6px;
 }
-.days div {
-    font-weight: 600;
-    color: #555;
-    padding: 6px 0;
-}
+.days div { font-weight: 600; color: #555; padding: 6px 0; }
+
 .dates {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -73,7 +70,6 @@ body {
 .today { border: 2px solid #ff8ac0; font-weight: 700; }
 
 .event {
-    background: #ff8ac0a0;
     font-size: 10px;
     padding: 2px 4px;
     border-radius: 6px;
@@ -82,7 +78,31 @@ body {
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+    cursor: pointer;
 }
+
+.event.pink { background: #ff8ac0a0; }
+.event.blue { background: #80d4ff80; }
+.event.yellow { background: #fff77f80; }
+
+.event:hover { opacity:0.7; }
+
+.menu {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.menu button {
+    padding:6px 10px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    background: linear-gradient(90deg,#ffd6e8,#dff4ff);
+    transition:0.2s;
+}
+.menu button:hover{ transform: scale(1.05); }
 </style>
 </head>
 <body>
@@ -91,6 +111,10 @@ body {
         <button id="prevMonth">⬅</button>
         <h2 id="monthYear">Listopad 2025</h2>
         <button id="nextMonth">➡</button>
+    </div>
+    <div class="menu">
+        <button id="addEvent">➕ Přidat událost</button>
+        <button id="deleteEvent">🗑 Vymazat událost</button>
     </div>
     <div class="days">
         <div>Po</div><div>Út</div><div>St</div><div>Čt</div><div>Pá</div><div>So</div><div>Ne</div>
@@ -101,15 +125,12 @@ body {
 <script>
 const datesEl = document.getElementById('dates');
 const monthYearEl = document.getElementById('monthYear');
-
 let today = new Date();
 let currentMonth = today.getMonth();
 let currentYear = today.getFullYear();
-
 const months = ["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"];
-
-// uložiště událostí
 let events = JSON.parse(localStorage.getItem('events')) || {};
+let selectedDate = null;
 
 function renderCalendar(month, year) {
     datesEl.innerHTML = '';
@@ -118,50 +139,37 @@ function renderCalendar(month, year) {
     const shift = (firstDay+6)%7;
     const daysInMonth = new Date(year, month+1,0).getDate();
 
-    // prázdná místa
     for(let i=0;i<shift;i++){
         const empty = document.createElement('div');
         datesEl.appendChild(empty);
     }
+
     for(let i=1;i<=daysInMonth;i++){
         const dateDiv = document.createElement('div');
         dateDiv.textContent = i;
         dateDiv.classList.add('date');
-        // pastelové barvy
         if(i%3===1) dateDiv.classList.add('pastel-pink');
         else if(i%3===2) dateDiv.classList.add('pastel-blue');
         else dateDiv.classList.add('pastel-yellow');
 
-        // dnešní den
         if(i===today.getDate() && month===today.getMonth() && year===today.getFullYear()) dateDiv.classList.add('today');
 
-        // přidání existujících událostí
         const key = `${year}-${month+1}-${i}`;
         if(events[key]){
             events[key].forEach(ev=>{
                 const evDiv = document.createElement('span');
-                evDiv.classList.add('event');
-                evDiv.textContent = ev;
+                evDiv.classList.add('event',ev.color);
+                evDiv.textContent = ev.text;
                 dateDiv.appendChild(evDiv);
             });
         }
 
-        // kliknutí na den → přidat událost
-        dateDiv.addEventListener('click',()=>{
-            const eventText = prompt("Napiš událost pro tento den:");
-            if(eventText){
-                if(!events[key]) events[key]=[];
-                events[key].push(eventText);
-                localStorage.setItem('events', JSON.stringify(events));
-                renderCalendar(currentMonth,currentYear);
-            }
-        });
+        dateDiv.addEventListener('click',()=>{ selectedDate = key; alert(`Vybral jsi den: ${key}`); });
 
         datesEl.appendChild(dateDiv);
     }
 }
 
-// tlačítka přepínání
 document.getElementById('prevMonth').addEventListener('click',()=>{
     currentMonth--;
     if(currentMonth<0){ currentMonth=11; currentYear--; }
@@ -173,8 +181,35 @@ document.getElementById('nextMonth').addEventListener('click',()=>{
     renderCalendar(currentMonth,currentYear);
 });
 
+// přidání události
+document.getElementById('addEvent').addEventListener('click',()=>{
+    if(!selectedDate){ alert("Nejdřív vyber den kliknutím!"); return; }
+    const text = prompt("Napiš název události:");
+    if(!text) return;
+    const color = prompt("Zvol barvu: pink, blue, yellow","pink");
+    if(!events[selectedDate]) events[selectedDate]=[];
+    events[selectedDate].push({text,color});
+    localStorage.setItem('events',JSON.stringify(events));
+    renderCalendar(currentMonth,currentYear);
+});
+
+// mazání události
+document.getElementById('deleteEvent').addEventListener('click',()=>{
+    if(!selectedDate || !events[selectedDate]){ alert("Žádná událost k vymazání!"); return; }
+    const list = events[selectedDate].map((e,i)=>`${i+1}: ${e.text}`).join("\n");
+    const index = prompt(`Vyber číslo události k vymazání:\n${list}`);
+    const i = parseInt(index)-1;
+    if(!isNaN(i) && events[selectedDate][i]){ 
+        events[selectedDate].splice(i,1);
+        if(events[selectedDate].length===0) delete events[selectedDate];
+        localStorage.setItem('events',JSON.stringify(events));
+        renderCalendar(currentMonth,currentYear);
+    }
+});
+
 renderCalendar(currentMonth,currentYear);
 </script>
 </body>
 </html>
+
 
