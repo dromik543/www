@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pastelový Denní Horoskop s Kategoriemi</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ffd6e8, #dff4ff, #fff7c2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin:0;
+}
+.container {
+    background: rgba(255,255,255,0.85);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 30px;
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+}
+h1 {
+    color: #ff6ea8;
+    margin-bottom: 20px;
+}
+select, button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 12px;
+    margin: 8px 0;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+    transition:0.2s;
+}
+select { width: 80%; background: #fff7c2; }
+button { background: #dff4ff; }
+button:hover { transform: scale(1.05); }
+
+#horoscope {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 16px;
+    background: #ffd6e8;
+    color: #333;
+    font-weight: 500;
+    min-height: 100px;
+    text-align: left;
+}
+.category {
+    font-weight: 700;
+    margin-top: 10px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Denní Horoskop 🌸</h1>
+    <select id="sign">
+        <option value="">Vyber své znamení</option>
+        <option value="Beran">Beran</option>
+        <option value="Býk">Býk</option>
+        <option value="Blíženci">Blíženci</option>
+        <option value="Rak">Rak</option>
+        <option value="Lev">Lev</option>
+        <option value="Panna">Panna</option>
+        <option value="Váhy">Váhy</option>
+        <option value="Štír">Štír</option>
+        <option value="Střelec">Střelec</option>
+        <option value="Kozoroh">Kozoroh</option>
+        <option value="Vodnář">Vodnář</option>
+        <option value="Ryby">Ryby</option>
+    </select>
+    <br>
+    <select id="category">
+        <option value="all">Všechny kategorie</option>
+        <option value="love">Láska 💖</option>
+        <option value="work">Práce 💼</option>
+        <option value="health">Zdraví 🌿</option>
+    </select>
+    <br>
+    <button onclick="generateHoroscope()">Zobraz horoskop</button>
+    <div id="horoscope"></div>
+</div>
+
+<script>
+const horoscopes = {
+    "Beran": {
+        love: ["Dnes je vhodný čas pro romantická gesta.", "Komunikace s partnerem bude hladká a upřímná.", "Možná setkáš někoho zajímavého."],
+        work: ["Tvá iniciativa na pracovišti bude oceněna.", "Dnes se může objevit nová příležitost.", "Buď připravený na změny v projektu."],
+        health: ["Dnes se soustřeď na relaxaci a dechová cvičení.", "Nezapomínej na dostatek vody.", "Krátká procházka ti dodá energii."]
+    },
+    "Býk": {
+        love: ["Trpělivost dnes přinese harmonii ve vztazích.", "Dopřej si romantický večer.", "Dnes je dobrý den pro hluboký rozhovor."],
+        work: ["Tvá pečlivost se vyplatí.", "Může přijít nabídka, kterou je třeba zvážit.", "Organizace bude klíč k úspěchu."],
+        health: ["Zaměř se na vyváženou stravu.", "Nepřetěžuj se fyzicky.", "Odpolední klid ti pomůže dobít energii."]
+    },
+    "Blíženci": {
+        love: ["Dnes komunikace přinese nové nápady ve vztahu.", "Ujisti se, že posloucháš svého partnera.", "Setkání může přinést překvapení."],
+        work: ["Tvůj nápad dnes zazáří.", "Buď otevřený spolupráci.", "Komunikace s kolegy bude hladká."],
+        health: ["Dopřej si dostatek spánku.", "Krátké cvičení pomůže uvolnit napětí.", "Relaxuj s knihou nebo hudbou."]
+    },
+    // ... sem můžeš přidat další znamení se stejnou strukturou
+};
+
+function generateHoroscope(){
+    const sign = document.getElementById('sign').value;
+    const cat = document.getElementById('category').value;
+    const display = document.getElementById('horoscope');
+    display.innerHTML = "";
+
+    if(!sign){ alert("Vyber své znamení!"); return; }
+    const categories = horoscopes[sign];
+    
+    if(cat==="all"){
+        for(let c in categories){
+            const arr = categories[c];
+            const random = arr[Math.floor(Math.random()*arr.length)];
+            const div = document.createElement('div');
+            div.innerHTML = `<span class="category">${c.charAt(0).toUpperCase()+c.slice(1)}:</span> ${random}`;
+            display.appendChild(div);
+        }
+    } else {
+        const arr = categories[cat];
+        const random = arr[Math.floor(Math.random()*arr.length)];
+        display.innerHTML = `<span class="category">${cat.charAt(0).toUpperCase()+cat.slice(1)}:</span> ${random}`;
+    }
+}
+</script>
+</body>
+</html>
