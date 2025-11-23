@@ -3,74 +3,120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pastelový To-Do List</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<title>Pastelový To-Do List s Kalendářem</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #ffd6e8, #dff4ff, #fff7c2);
     margin: 0;
     padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ffd6e8, #dff4ff, #fff7c2);
+    min-height: 100vh;
     display: flex;
     justify-content: center;
-    min-height: 100vh;
 }
 
 .container {
-    margin-top: 50px;
+    margin-top: 40px;
     background: white;
     padding: 30px;
-    border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    width: 90%;
-    max-width: 500px;
+    border-radius: 30px;
+    max-width: 900px;
+    width: 95%;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
 }
 
 h1 {
     text-align: center;
     color: #ff6ea8;
+    font-size: 40px;
     margin-bottom: 20px;
 }
 
-input {
-    width: 70%;
+/* Layout 2 sloupce */
+.wrapper {
+    display: flex;
+    gap: 30px;
+}
+
+/* Vstupní panel */
+.input-box {
+    flex: 1;
+    background: #dff4ff;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.input-box h2 {
+    margin-top: 0;
+    color: #3a8bbd;
+}
+
+.input-box input {
+    width: 100%;
     padding: 12px;
     border-radius: 12px;
     border: none;
-    background: #dff4ff;
+    margin-bottom: 10px;
+    background: #fff;
     font-size: 16px;
 }
 
-button {
-    padding: 12px 20px;
+.input-box button {
+    width: 100%;
+    padding: 12px;
     border: none;
     border-radius: 12px;
     background: #ffd6e8;
-    font-weight: 600;
     cursor: pointer;
+    font-weight: 600;
     transition: 0.2s;
+    font-size: 17px;
 }
 
-button:hover {
+.input-box button:hover {
     transform: scale(1.05);
+}
+
+/* Seznam */
+.tasks {
+    flex: 2;
+    background: #fff7c2;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.tasks h2 {
+    margin-top: 0;
+    color: #caa800;
 }
 
 ul {
     list-style: none;
     padding: 0;
-    margin-top: 20px;
 }
 
 li {
-    background: #fff7c2;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-radius: 12px;
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-left: 6px solid #ffd6e8;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+li span {
     font-size: 17px;
+    font-weight: 500;
+}
+
+.date {
+    color: #888;
+    font-size: 14px;
 }
 
 .done {
@@ -78,10 +124,21 @@ li {
     opacity: 0.6;
 }
 
-.actionBtns button {
+.actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 10px;
     margin-left: 5px;
-    padding: 7px 12px;
+    cursor: pointer;
     font-size: 14px;
+}
+
+.completeBtn {
+    background: #dff4ff;
+}
+
+.deleteBtn {
+    background: #ffd6e8;
 }
 </style>
 </head>
@@ -89,69 +146,91 @@ li {
 <body>
 
 <div class="container">
-    <h1>📋 Pastelový To-Do List</h1>
+    <h1>🌸 Pastelový To-Do List + Kalendář</h1>
 
-    <input type="text" id="taskInput" placeholder="Napiš úkol...">
-    <button onclick="addTask()">➕ Přidat</button>
+    <div class="wrapper">
 
-    <ul id="taskList"></ul>
+        <!-- LEVÁ STRANA - zadávání -->
+        <div class="input-box">
+            <h2>Přidat úkol</h2>
+            <input type="text" id="taskText" placeholder="Napiš úkol...">
+            <input type="date" id="taskDate">
+            <button onclick="addTask()">➕ Přidat úkol</button>
+        </div>
+
+        <!-- PRAVÁ STRANA - seznam -->
+        <div class="tasks">
+            <h2>Moje úkoly</h2>
+            <ul id="taskList"></ul>
+        </div>
+
+    </div>
 </div>
 
 <script>
-// Načíst uložené úkoly
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 renderTasks();
 
-// Přidání úkolu
-function addTask() {
-    const input = document.getElementById("taskInput");
-    const text = input.value.trim();
-    if (text === "") return;
+function addTask(){
+    const text = document.getElementById("taskText").value.trim();
+    const date = document.getElementById("taskDate").value;
 
-    tasks.push({ text: text, done: false });
-    input.value = "";
+    if(!text || !date) return;
+
+    tasks.push({
+        text: text,
+        date: date,
+        done: false
+    });
+
     saveTasks();
+    document.getElementById("taskText").value = "";
+    document.getElementById("taskDate").value = "";
     renderTasks();
 }
 
-// Vykreslení úkolů
-function renderTasks() {
+function renderTasks(){
+    tasks.sort((a,b)=> new Date(a.date) - new Date(b.date));
+
     const list = document.getElementById("taskList");
     list.innerHTML = "";
 
-    tasks.forEach((task, index) => {
+    tasks.forEach((task, i)=>{
         const li = document.createElement("li");
 
         li.innerHTML = `
-            <span class="${task.done ? "done" : ""}">${task.text}</span>
-            <div class="actionBtns">
-                <button onclick="toggleDone(${index})">✔️</button>
-                <button onclick="deleteTask(${index})">🗑️</button>
+            <div>
+                <span class="${task.done ? "done":""}">${task.text}</span>
+                <div class="date">📅 ${task.date}</div>
+            </div>
+
+            <div class="actions">
+                <button class="completeBtn" onclick="toggleDone(${i})">✔️</button>
+                <button class="deleteBtn" onclick="deleteTask(${i})">🗑️</button>
             </div>
         `;
+
         list.appendChild(li);
     });
 }
 
-// Označit jako hotové
-function toggleDone(index) {
-    tasks[index].done = !tasks[index].done;
+function toggleDone(i){
+    tasks[i].done = !tasks[i].done;
     saveTasks();
     renderTasks();
 }
 
-// Smazat úkol
-function deleteTask(index) {
-    tasks.splice(index, 1);
+function deleteTask(i){
+    tasks.splice(i,1);
     saveTasks();
     renderTasks();
 }
 
-// Uložit do prohlížeče
-function saveTasks() {
+function saveTasks(){
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 </script>
 
 </body>
 </html>
+
