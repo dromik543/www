@@ -1,131 +1,220 @@
-```html
+
 <!DOCTYPE html>
 <html lang="cs">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Countdown</title>
 
-    <!-- Elegantní font -->
+
+    <!-- =========================================
+         FONT
+         ========================================= -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+          rel="stylesheet">
+
 
     <style>
+
+        /* =========================================
+           ZÁKLAD
+           ========================================= */
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
+
         body {
-            width: 100%;
+
+            width: 100vw;
             height: 100vh;
+
             overflow: hidden;
 
             background: #000;
-            color: #fff;
+
+            color: white;
 
             font-family: "Inter", sans-serif;
 
             display: flex;
-            align-items: center;
+
             justify-content: center;
+
+            align-items: center;
+
         }
 
-        /* Jemný světelný efekt uprostřed */
+
+        /* =========================================
+           JEMNÁ ZÁŘE UPROSTŘED
+           ========================================= */
+
         body::before {
+
             content: "";
+
             position: fixed;
+
             inset: 0;
 
             background:
+
                 radial-gradient(
                     circle at center,
-                    rgba(255,255,255,0.035) 0%,
-                    rgba(0,0,0,0) 55%
+                    rgba(255,255,255,0.035),
+                    transparent 55%
                 );
 
             pointer-events: none;
+
         }
+
+
+        /* =========================================
+           HLAVNÍ KONTEJNER
+           ========================================= */
 
         .container {
-            width: 95%;
-            max-width: 1500px;
+
+            width: 96%;
+
+            max-width: 1600px;
+
             text-align: center;
+
         }
 
-        /* Horní text */
+
+        /* =========================================
+           NADPIS
+           ========================================= */
+
         .title {
-            font-size: 13px;
+
+            font-size: 12px;
+
             font-weight: 400;
 
-            letter-spacing: 8px;
+            letter-spacing: 9px;
+
             text-transform: uppercase;
 
-            color: rgba(255,255,255,0.45);
+            color: rgba(255,255,255,0.4);
 
-            margin-bottom: 45px;
+            margin-bottom: 48px;
+
         }
 
-        /* Countdown */
+
+        /* =========================================
+           COUNTDOWN
+           ========================================= */
+
         .countdown {
+
             display: flex;
+
             justify-content: center;
+
             align-items: center;
 
-            gap: clamp(10px, 2vw, 35px);
+            gap: clamp(8px, 1.8vw, 32px);
+
         }
+
+
+        /* =========================================
+           JEDNOTKA
+           ========================================= */
 
         .unit {
+
             display: flex;
+
             flex-direction: column;
+
             align-items: center;
 
-            min-width: clamp(65px, 12vw, 180px);
+            min-width: clamp(65px, 12vw, 190px);
+
         }
 
-        /* Čísla */
+
+        /* =========================================
+           ČÍSLA
+           ========================================= */
+
         .number {
-            font-size: clamp(45px, 9vw, 125px);
+
+            font-size: clamp(45px, 9vw, 130px);
 
             font-weight: 300;
+
             line-height: 0.95;
 
             letter-spacing: -5px;
 
             font-variant-numeric: tabular-nums;
 
-            transition:
-                opacity 0.15s ease,
-                transform 0.15s ease;
         }
 
-        /* Jemný efekt při změně čísla */
+
+        /* =========================================
+           ANIMACE PŘI ZMĚNĚ
+           ========================================= */
+
         .number.change {
-            animation: numberChange 0.25s ease;
+
+            animation: changeNumber 0.22s ease;
+
         }
 
-        @keyframes numberChange {
+
+        @keyframes changeNumber {
 
             0% {
-                opacity: 0.35;
+
+                opacity: 0.25;
+
                 transform: translateY(-5px);
+
             }
 
             100% {
+
                 opacity: 1;
+
                 transform: translateY(0);
+
             }
 
         }
 
-        /* Názvy jednotek */
+
+        /* =========================================
+           NÁZVY
+           ========================================= */
+
         .label {
+
             margin-top: 20px;
 
-            font-size: clamp(9px, 1vw, 13px);
+            font-size: clamp(8px, 0.9vw, 12px);
 
             font-weight: 400;
 
@@ -133,46 +222,66 @@
 
             text-transform: uppercase;
 
-            color: rgba(255,255,255,0.35);
+            color: rgba(255,255,255,0.32);
+
         }
 
-        /* Dvojtečky */
+
+        /* =========================================
+           DVOJTEČKY
+           ========================================= */
+
         .separator {
+
             font-size: clamp(30px, 5vw, 70px);
 
             font-weight: 200;
 
-            color: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.18);
 
             margin-bottom: 28px;
+
         }
 
-        /* Datum */
+
+        /* =========================================
+           DATUM
+           ========================================= */
+
         .date {
+
             margin-top: 60px;
 
-            font-size: 11px;
+            font-size: 10px;
 
-            letter-spacing: 5px;
+            letter-spacing: 6px;
 
-            color: rgba(255,255,255,0.25);
+            color: rgba(255,255,255,0.22);
 
             text-transform: uppercase;
+
         }
 
-        /* Tlačítko zvuku */
+
+        /* =========================================
+           TLAČÍTKO ZVUKU
+           ========================================= */
+
         #soundButton {
+
             position: fixed;
 
-            bottom: 30px;
             right: 30px;
 
+            bottom: 30px;
+
             width: 42px;
+
             height: 42px;
 
-            border: 1px solid rgba(255,255,255,0.2);
-
             border-radius: 50%;
+
+            border: 1px solid rgba(255,255,255,0.2);
 
             background: rgba(255,255,255,0.03);
 
@@ -182,19 +291,28 @@
 
             font-size: 15px;
 
-            transition: all 0.2s ease;
+            transition: 0.2s;
+
         }
 
+
         #soundButton:hover {
+
             background: rgba(255,255,255,0.1);
+
+            border-color: rgba(255,255,255,0.45);
 
             color: white;
 
-            border-color: rgba(255,255,255,0.5);
         }
 
-        /* Filmový grain */
+
+        /* =========================================
+           FILMOVÝ GRAIN
+           ========================================= */
+
         .grain {
+
             position: fixed;
 
             inset: -50%;
@@ -204,195 +322,292 @@
             opacity: 0.025;
 
             background-image:
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
 
-            animation: grain 0.2s steps(2) infinite;
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.7'/%3E%3C/svg%3E");
+
+            animation: grainMove 0.2s steps(2) infinite;
+
         }
 
-        @keyframes grain {
+
+        @keyframes grainMove {
 
             0% {
                 transform: translate(0,0);
             }
 
             25% {
-                transform: translate(2%, -2%);
+                transform: translate(2%,-2%);
             }
 
             50% {
-                transform: translate(-2%, 2%);
+                transform: translate(-2%,2%);
             }
 
             75% {
-                transform: translate(2%, 2%);
+                transform: translate(2%,2%);
             }
 
             100% {
-                transform: translate(-2%, -2%);
+                transform: translate(-2%,-2%);
             }
 
         }
 
-        /* Mobil */
+
+        /* =========================================
+           MOBIL
+           ========================================= */
+
         @media (max-width: 700px) {
 
             .countdown {
-                gap: 5px;
+
+                gap: 4px;
+
             }
+
 
             .number {
+
                 font-size: 11vw;
+
                 letter-spacing: -2px;
+
             }
+
 
             .unit {
+
                 min-width: 17vw;
+
             }
+
 
             .label {
+
+                font-size: 6px;
+
                 letter-spacing: 2px;
-                font-size: 7px;
+
                 margin-top: 12px;
+
             }
+
 
             .separator {
+
                 font-size: 8vw;
+
                 margin-bottom: 18px;
+
             }
+
 
             .title {
+
+                font-size: 8px;
+
                 letter-spacing: 5px;
-                font-size: 9px;
+
                 margin-bottom: 35px;
+
             }
 
+
             .date {
+
                 margin-top: 45px;
+
                 font-size: 8px;
+
                 letter-spacing: 3px;
+
             }
 
         }
 
     </style>
+
 </head>
 
 
 <body>
 
-    <!-- Filmový grain -->
+
+    <!-- FILMOVÝ GRAIN -->
+
     <div class="grain"></div>
 
 
+    <!-- =========================================
+         HLAVNÍ OBSAH
+         ========================================= -->
+
     <main class="container">
 
-        <!-- Nadpis -->
+
         <div class="title">
+
             The countdown begins
+
         </div>
 
-
-        <!-- COUNTDOWN -->
 
         <div class="countdown">
 
+
+            <!-- MĚSÍCE -->
+
             <div class="unit">
 
-                <div class="number" id="months">
+                <div
+                    class="number"
+                    id="months">
+
                     00
+
                 </div>
 
                 <div class="label">
+
                     Months
+
                 </div>
 
             </div>
 
 
             <div class="separator">
+
                 :
+
             </div>
 
 
+            <!-- DNY -->
+
             <div class="unit">
 
-                <div class="number" id="days">
+                <div
+                    class="number"
+                    id="days">
+
                     00
+
                 </div>
 
                 <div class="label">
+
                     Days
+
                 </div>
 
             </div>
 
 
             <div class="separator">
+
                 :
+
             </div>
 
 
+            <!-- HODINY -->
+
             <div class="unit">
 
-                <div class="number" id="hours">
+                <div
+                    class="number"
+                    id="hours">
+
                     00
+
                 </div>
 
                 <div class="label">
+
                     Hours
+
                 </div>
 
             </div>
 
 
             <div class="separator">
+
                 :
+
             </div>
 
 
+            <!-- MINUTY -->
+
             <div class="unit">
 
-                <div class="number" id="minutes">
+                <div
+                    class="number"
+                    id="minutes">
+
                     00
+
                 </div>
 
                 <div class="label">
+
                     Minutes
+
                 </div>
 
             </div>
 
 
             <div class="separator">
+
                 :
+
             </div>
 
+
+            <!-- SEKUNDY -->
 
             <div class="unit">
 
-                <div class="number" id="seconds">
+                <div
+                    class="number"
+                    id="seconds">
+
                     00
+
                 </div>
 
                 <div class="label">
+
                     Seconds
+
                 </div>
 
             </div>
+
 
         </div>
 
 
-        <!-- Datum -->
+        <!-- DATUM -->
 
         <div class="date">
+
             15 · 08 · 2027
+
         </div>
+
 
     </main>
 
 
-    <!-- Tlačítko zvuku -->
+    <!-- =========================================
+         SOUND BUTTON
+         ========================================= -->
 
     <button
         id="soundButton"
@@ -405,12 +620,16 @@
 
     <script>
 
+
         /* =========================================
-           DATUM
+           CÍLOVÉ DATUM
            ========================================= */
 
         const targetDate =
-            new Date("2027-08-15T00:00:00");
+
+            new Date(
+                "2027-08-15T00:00:00"
+            );
 
 
         /* =========================================
@@ -450,13 +669,19 @@
             if (!audioContext) {
 
                 audioContext = new (
+
                     window.AudioContext ||
                     window.webkitAudioContext
+
                 )();
 
             }
 
-            if (audioContext.state === "suspended") {
+
+            if (
+                audioContext.state ===
+                "suspended"
+            ) {
 
                 audioContext.resume();
 
@@ -465,37 +690,57 @@
         }
 
 
-        /*
-         * MECHANICKÉ TIKNUTÍ
-         *
-         * Zvuk se skládá z krátkého úderu
-         * a druhého jemného kliknutí.
-         *
-         * Díky tomu připomíná mechanické
-         * hodiny více než elektronické pípnutí.
-         */
+        /* =========================================
+           MECHANICKÉ TIKNUTÍ
+           =========================================
 
-        function tick(volume, pitch, duration) {
+           Toto je hlavní zvuk.
 
-            if (!soundEnabled) return;
+           Není to elektronické pípnutí.
+
+           Používá krátký impulz,
+           který připomíná úder
+           mechanismu mechanických hodin.
+
+        ========================================= */
+
+
+        function clockTick(
+            strength,
+            pitch,
+            length
+        ) {
+
+
+            if (!soundEnabled)
+                return;
+
 
             createAudio();
 
-            const ctx = audioContext;
 
-            const now = ctx.currentTime;
+            const ctx =
+                audioContext;
 
 
-            /* První mechanický úder */
+            const now =
+                ctx.currentTime;
+
+
+            /* -------------------------------------
+               HLAVNÍ ÚDER
+               ------------------------------------- */
 
             const oscillator =
                 ctx.createOscillator();
+
 
             const gain =
                 ctx.createGain();
 
 
-            oscillator.type = "square";
+            oscillator.type =
+                "triangle";
 
 
             oscillator.frequency.setValueAtTime(
@@ -504,67 +749,84 @@
             );
 
 
+            /*
+             * Velmi rychlý náběh
+             * vytvoří charakteristický
+             * mechanický úder.
+             */
+
             gain.gain.setValueAtTime(
                 0.0001,
                 now
             );
 
 
-            gain.gain.linearRampToValueAtTime(
-                volume,
-                now + 0.003
+            gain.gain.exponentialRampToValueAtTime(
+                strength,
+                now + 0.002
             );
 
 
             gain.gain.exponentialRampToValueAtTime(
                 0.0001,
-                now + duration
+                now + length
             );
 
 
             oscillator.connect(gain);
 
-            gain.connect(ctx.destination);
+
+            gain.connect(
+                ctx.destination
+            );
 
 
             oscillator.start(now);
 
+
             oscillator.stop(
-                now + duration
+                now + length
             );
 
 
-            /* Druhý menší klik */
+            /* -------------------------------------
+               VELMI KRÁTKÉ "CVAKNUTÍ"
+               ------------------------------------- */
 
             const click =
                 ctx.createOscillator();
+
 
             const clickGain =
                 ctx.createGain();
 
 
-            click.type = "triangle";
+            click.type =
+                "square";
 
 
             click.frequency.setValueAtTime(
-                pitch * 0.55,
+                pitch * 2.2,
                 now
             );
 
 
             clickGain.gain.setValueAtTime(
-                volume * 0.7,
+                strength * 0.35,
                 now
             );
 
 
             clickGain.gain.exponentialRampToValueAtTime(
                 0.0001,
-                now + duration * 0.55
+                now + 0.018
             );
 
 
-            click.connect(clickGain);
+            click.connect(
+                clickGain
+            );
+
 
             clickGain.connect(
                 ctx.destination
@@ -573,8 +835,9 @@
 
             click.start(now);
 
+
             click.stop(
-                now + duration * 0.55
+                now + 0.02
             );
 
         }
@@ -582,15 +845,18 @@
 
         /* =========================================
            SEKUNDA
-           malé klasické TIK
            ========================================= */
 
         function secondTick() {
 
-            tick(
-                0.045,
-                1050,
+            clockTick(
+
+                0.055,
+
+                1250,
+
                 0.055
+
             );
 
         }
@@ -598,15 +864,18 @@
 
         /* =========================================
            MINUTA
-           větší TIK
            ========================================= */
 
         function minuteTick() {
 
-            tick(
-                0.09,
-                720,
-                0.085
+            clockTick(
+
+                0.11,
+
+                850,
+
+                0.075
+
             );
 
         }
@@ -614,15 +883,18 @@
 
         /* =========================================
            HODINA
-           hlubší TIK
            ========================================= */
 
         function hourTick() {
 
-            tick(
-                0.15,
-                500,
-                0.12
+            clockTick(
+
+                0.17,
+
+                620,
+
+                0.10
+
             );
 
         }
@@ -630,15 +902,18 @@
 
         /* =========================================
            DEN
-           velký TIK
            ========================================= */
 
         function dayTick() {
 
-            tick(
-                0.22,
-                340,
-                0.17
+            clockTick(
+
+                0.25,
+
+                430,
+
+                0.15
+
             );
 
         }
@@ -646,15 +921,18 @@
 
         /* =========================================
            MĚSÍC
-           největší TIK
            ========================================= */
 
         function monthTick() {
 
-            tick(
-                0.32,
-                220,
-                0.25
+            clockTick(
+
+                0.36,
+
+                300,
+
+                0.22
+
             );
 
         }
@@ -666,7 +944,8 @@
 
         soundButton.addEventListener(
             "click",
-            () => {
+            function() {
+
 
                 soundEnabled =
                     !soundEnabled;
@@ -674,23 +953,27 @@
 
                 if (soundEnabled) {
 
+
                     createAudio();
+
 
                     soundButton.textContent =
                         "🔊";
 
 
                     /*
-                     * Testovací tik po zapnutí
+                     * Testovací mechanické tiknutí
                      */
 
-                    tick(
-                        0.09,
-                        720,
-                        0.085
+                    clockTick(
+                        0.11,
+                        850,
+                        0.075
                     );
 
+
                 } else {
+
 
                     soundButton.textContent =
                         "🔇";
@@ -702,10 +985,10 @@
 
 
         /* =========================================
-           NULA PŘED ČÍSLEM
+           DOPLNĚNÍ NULY
            ========================================= */
 
-        function addLeadingZero(number) {
+        function twoDigits(number) {
 
             return String(number)
                 .padStart(2, "0");
@@ -714,19 +997,16 @@
 
 
         /* =========================================
-           ANIMACE ČÍSLA
+           ANIMACE
            ========================================= */
 
         function animate(element) {
+
 
             element.classList.remove(
                 "change"
             );
 
-
-            /*
-             * Restartování CSS animace
-             */
 
             void element.offsetWidth;
 
@@ -763,6 +1043,7 @@
 
         function updateCountdown() {
 
+
             const now =
                 new Date();
 
@@ -771,9 +1052,12 @@
                 targetDate - now;
 
 
-            /* Countdown skončil */
+            /* -------------------------------------
+               KONEC ODPOČTU
+               ------------------------------------- */
 
             if (difference <= 0) {
+
 
                 monthsElement.textContent =
                     "00";
@@ -790,16 +1074,18 @@
                 secondsElement.textContent =
                     "00";
 
+
                 return;
 
             }
 
 
-            /* =====================================
+            /* -------------------------------------
                MĚSÍCE
-               ===================================== */
+               ------------------------------------- */
 
             let months = 0;
+
 
             let tempDate =
                 new Date(now);
@@ -807,7 +1093,8 @@
 
             while (true) {
 
-                let nextMonth =
+
+                const nextMonth =
                     new Date(tempDate);
 
 
@@ -816,14 +1103,20 @@
                 );
 
 
-                if (nextMonth <= targetDate) {
+                if (
+                    nextMonth <= targetDate
+                ) {
+
 
                     months++;
+
 
                     tempDate =
                         nextMonth;
 
+
                 } else {
+
 
                     break;
 
@@ -832,9 +1125,9 @@
             }
 
 
-            /* =====================================
-               ZBYTEK PO MĚSÍCÍCH
-               ===================================== */
+            /* -------------------------------------
+               ZBYTEK
+               ------------------------------------- */
 
             let remaining =
                 targetDate - tempDate;
@@ -842,178 +1135,261 @@
 
             const days =
                 Math.floor(
+
                     remaining /
-                    (1000 * 60 * 60 * 24)
+                    (
+                        1000 *
+                        60 *
+                        60 *
+                        24
+                    )
+
                 );
 
 
             remaining -=
+
                 days *
-                (1000 * 60 * 60 * 24);
+                (
+                    1000 *
+                    60 *
+                    60 *
+                    24
+                );
 
 
             const hours =
                 Math.floor(
+
                     remaining /
-                    (1000 * 60 * 60)
+                    (
+                        1000 *
+                        60 *
+                        60
+                    )
+
                 );
 
 
             remaining -=
+
                 hours *
-                (1000 * 60 * 60);
+                (
+                    1000 *
+                    60 *
+                    60
+                );
 
 
             const minutes =
                 Math.floor(
+
                     remaining /
-                    (1000 * 60)
+                    (
+                        1000 *
+                        60
+                    )
+
                 );
 
 
             remaining -=
+
                 minutes *
-                (1000 * 60);
+                (
+                    1000 *
+                    60
+                );
 
 
             const seconds =
                 Math.floor(
-                    remaining / 1000
+
+                    remaining /
+                    1000
+
                 );
 
 
-            /* =====================================
-               FORMÁT
-               ===================================== */
+            /* -------------------------------------
+               HODNOTY
+               ------------------------------------- */
 
             const values = {
 
+
                 months:
-                    addLeadingZero(months),
+                    twoDigits(months),
+
 
                 days:
-                    addLeadingZero(days),
+                    twoDigits(days),
+
 
                 hours:
-                    addLeadingZero(hours),
+                    twoDigits(hours),
+
 
                 minutes:
-                    addLeadingZero(minutes),
+                    twoDigits(minutes),
+
 
                 seconds:
-                    addLeadingZero(seconds)
+                    twoDigits(seconds)
 
             };
 
 
-            /* =====================================
+            /* -------------------------------------
                ZOBRAZENÍ
-               ===================================== */
+               ------------------------------------- */
 
             monthsElement.textContent =
                 values.months;
 
+
             daysElement.textContent =
                 values.days;
+
 
             hoursElement.textContent =
                 values.hours;
 
+
             minutesElement.textContent =
                 values.minutes;
+
 
             secondsElement.textContent =
                 values.seconds;
 
 
-            /* =====================================
-               SEKUNDY
-               ===================================== */
+            /* -------------------------------------
+               SEKUNDA
+               ------------------------------------- */
 
             if (
+
                 previous.seconds !== null &&
+
                 previous.seconds !==
-                    values.seconds
+                values.seconds
+
             ) {
 
-                animate(secondsElement);
+
+                animate(
+                    secondsElement
+                );
+
 
                 secondTick();
 
             }
 
 
-            /* =====================================
-               MINUTY
-               ===================================== */
+            /* -------------------------------------
+               MINUTA
+               ------------------------------------- */
 
             if (
+
                 previous.minutes !== null &&
+
                 previous.minutes !==
-                    values.minutes
+                values.minutes
+
             ) {
 
-                animate(minutesElement);
+
+                animate(
+                    minutesElement
+                );
+
 
                 minuteTick();
 
             }
 
 
-            /* =====================================
-               HODINY
-               ===================================== */
+            /* -------------------------------------
+               HODINA
+               ------------------------------------- */
 
             if (
+
                 previous.hours !== null &&
+
                 previous.hours !==
-                    values.hours
+                values.hours
+
             ) {
 
-                animate(hoursElement);
+
+                animate(
+                    hoursElement
+                );
+
 
                 hourTick();
 
             }
 
 
-            /* =====================================
-               DNY
-               ===================================== */
+            /* -------------------------------------
+               DEN
+               ------------------------------------- */
 
             if (
+
                 previous.days !== null &&
+
                 previous.days !==
-                    values.days
+                values.days
+
             ) {
 
-                animate(daysElement);
+
+                animate(
+                    daysElement
+                );
+
 
                 dayTick();
 
             }
 
 
-            /* =====================================
-               MĚSÍCE
-               ===================================== */
+            /* -------------------------------------
+               MĚSÍC
+               ------------------------------------- */
 
             if (
+
                 previous.months !== null &&
+
                 previous.months !==
-                    values.months
+                values.months
+
             ) {
 
-                animate(monthsElement);
+
+                animate(
+                    monthsElement
+                );
+
 
                 monthTick();
 
             }
 
 
-            /* Uložení hodnot */
+            /* -------------------------------------
+               ULOŽENÍ
+               ------------------------------------- */
 
-            previous = values;
+            previous =
+                values;
 
         }
 
@@ -1026,12 +1402,16 @@
 
 
         setInterval(
+
             updateCountdown,
+
             250
+
         );
 
     </script>
 
+
 </body>
+
 </html>
-```
