@@ -1,1417 +1,806 @@
-
 <!DOCTYPE html>
 <html lang="cs">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Countdown</title>
-
-
-    <!-- =========================================
-         FONT
-         ========================================= -->
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
-          rel="stylesheet">
-
-
-    <style>
-
-        /* =========================================
-           ZÁKLAD
-           ========================================= */
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-
-        body {
-
-            width: 100vw;
-            height: 100vh;
-
-            overflow: hidden;
-
-            background: #000;
-
-            color: white;
-
-            font-family: "Inter", sans-serif;
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
-        }
-
-
-        /* =========================================
-           JEMNÁ ZÁŘE UPROSTŘED
-           ========================================= */
-
-        body::before {
-
-            content: "";
-
-            position: fixed;
-
-            inset: 0;
-
-            background:
-
-                radial-gradient(
-                    circle at center,
-                    rgba(255,255,255,0.035),
-                    transparent 55%
-                );
-
-            pointer-events: none;
-
-        }
-
-
-        /* =========================================
-           HLAVNÍ KONTEJNER
-           ========================================= */
-
-        .container {
-
-            width: 96%;
-
-            max-width: 1600px;
-
-            text-align: center;
-
-        }
-
-
-        /* =========================================
-           NADPIS
-           ========================================= */
-
-        .title {
-
-            font-size: 12px;
-
-            font-weight: 400;
-
-            letter-spacing: 9px;
-
-            text-transform: uppercase;
-
-            color: rgba(255,255,255,0.4);
-
-            margin-bottom: 48px;
-
-        }
-
-
-        /* =========================================
-           COUNTDOWN
-           ========================================= */
-
-        .countdown {
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
-            gap: clamp(8px, 1.8vw, 32px);
-
-        }
-
-
-        /* =========================================
-           JEDNOTKA
-           ========================================= */
-
-        .unit {
-
-            display: flex;
-
-            flex-direction: column;
-
-            align-items: center;
-
-            min-width: clamp(65px, 12vw, 190px);
-
-        }
-
-
-        /* =========================================
-           ČÍSLA
-           ========================================= */
-
-        .number {
-
-            font-size: clamp(45px, 9vw, 130px);
-
-            font-weight: 300;
-
-            line-height: 0.95;
-
-            letter-spacing: -5px;
-
-            font-variant-numeric: tabular-nums;
-
-        }
-
-
-        /* =========================================
-           ANIMACE PŘI ZMĚNĚ
-           ========================================= */
-
-        .number.change {
-
-            animation: changeNumber 0.22s ease;
-
-        }
-
-
-        @keyframes changeNumber {
-
-            0% {
-
-                opacity: 0.25;
-
-                transform: translateY(-5px);
-
-            }
-
-            100% {
-
-                opacity: 1;
-
-                transform: translateY(0);
-
-            }
-
-        }
-
-
-        /* =========================================
-           NÁZVY
-           ========================================= */
-
-        .label {
-
-            margin-top: 20px;
-
-            font-size: clamp(8px, 0.9vw, 12px);
-
-            font-weight: 400;
-
-            letter-spacing: 4px;
-
-            text-transform: uppercase;
-
-            color: rgba(255,255,255,0.32);
-
-        }
-
-
-        /* =========================================
-           DVOJTEČKY
-           ========================================= */
-
-        .separator {
-
-            font-size: clamp(30px, 5vw, 70px);
-
-            font-weight: 200;
-
-            color: rgba(255,255,255,0.18);
-
-            margin-bottom: 28px;
-
-        }
-
-
-        /* =========================================
-           DATUM
-           ========================================= */
-
-        .date {
-
-            margin-top: 60px;
-
-            font-size: 10px;
-
-            letter-spacing: 6px;
-
-            color: rgba(255,255,255,0.22);
-
-            text-transform: uppercase;
-
-        }
-
-
-        /* =========================================
-           TLAČÍTKO ZVUKU
-           ========================================= */
-
-        #soundButton {
-
-            position: fixed;
-
-            right: 30px;
-
-            bottom: 30px;
-
-            width: 42px;
-
-            height: 42px;
-
-            border-radius: 50%;
-
-            border: 1px solid rgba(255,255,255,0.2);
-
-            background: rgba(255,255,255,0.03);
-
-            color: rgba(255,255,255,0.55);
-
-            cursor: pointer;
-
-            font-size: 15px;
-
-            transition: 0.2s;
-
-        }
-
-
-        #soundButton:hover {
-
-            background: rgba(255,255,255,0.1);
-
-            border-color: rgba(255,255,255,0.45);
-
-            color: white;
-
-        }
-
-
-        /* =========================================
-           FILMOVÝ GRAIN
-           ========================================= */
-
-        .grain {
-
-            position: fixed;
-
-            inset: -50%;
-
-            pointer-events: none;
-
-            opacity: 0.025;
-
-            background-image:
-
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.7'/%3E%3C/svg%3E");
-
-            animation: grainMove 0.2s steps(2) infinite;
-
-        }
-
-
-        @keyframes grainMove {
-
-            0% {
-                transform: translate(0,0);
-            }
-
-            25% {
-                transform: translate(2%,-2%);
-            }
-
-            50% {
-                transform: translate(-2%,2%);
-            }
-
-            75% {
-                transform: translate(2%,2%);
-            }
-
-            100% {
-                transform: translate(-2%,-2%);
-            }
-
-        }
-
-
-        /* =========================================
-           MOBIL
-           ========================================= */
-
-        @media (max-width: 700px) {
-
-            .countdown {
-
-                gap: 4px;
-
-            }
-
-
-            .number {
-
-                font-size: 11vw;
-
-                letter-spacing: -2px;
-
-            }
-
-
-            .unit {
-
-                min-width: 17vw;
-
-            }
-
-
-            .label {
-
-                font-size: 6px;
-
-                letter-spacing: 2px;
-
-                margin-top: 12px;
-
-            }
-
-
-            .separator {
-
-                font-size: 8vw;
-
-                margin-bottom: 18px;
-
-            }
-
-
-            .title {
-
-                font-size: 8px;
-
-                letter-spacing: 5px;
-
-                margin-bottom: 35px;
-
-            }
-
-
-            .date {
-
-                margin-top: 45px;
-
-                font-size: 8px;
-
-                letter-spacing: 3px;
-
-            }
-
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Countdown</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: #000;
+    color: #fff;
+    font-family: "Inter", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* jemné světlo uprostřed */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(255,255,255,0.055) 0%,
+            rgba(255,255,255,0.018) 25%,
+            transparent 60%
+        );
+    pointer-events: none;
+}
+
+/* film grain */
+body::after {
+    content: "";
+    position: fixed;
+    inset: -50%;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+    transform: rotate(10deg);
+}
+
+.container {
+    width: 100%;
+    max-width: 1500px;
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+/* horní text */
+
+.title {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    margin-bottom: 65px;
+}
+
+/* countdown */
+
+.countdown {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(12px, 2.5vw, 45px);
+}
+
+.unit {
+    min-width: 130px;
+}
+
+.number {
+    font-size: clamp(65px, 10vw, 155px);
+    font-weight: 300;
+    line-height: 0.85;
+    letter-spacing: -0.065em;
+
+    font-variant-numeric: tabular-nums;
+
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease;
+}
+
+.number.changed {
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+.label {
+    margin-top: 28px;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    opacity: 0.28;
+}
+
+.separator {
+    font-size: clamp(40px, 6vw, 85px);
+    font-weight: 200;
+    opacity: 0.18;
+    line-height: 0.8;
+    margin-top: -3px;
+}
+
+/* datum */
+
+.date {
+    margin-top: 75px;
+
+    font-size: 11px;
+    letter-spacing: 0.65em;
+    opacity: 0.32;
+}
+
+/* sound button */
+
+.sound {
+    position: fixed;
+    right: 28px;
+    bottom: 25px;
+
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(0,0,0,0.4);
+
+    color: rgba(255,255,255,0.55);
+
+    padding: 11px 15px;
+
+    font-family: inherit;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+.sound:hover {
+    border-color: rgba(255,255,255,0.4);
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+}
+
+.sound.active {
+    color: #fff;
+    border-color: rgba(255,255,255,0.45);
+}
+
+/* menší obrazovky */
+
+@media (max-width: 850px) {
+
+    .container {
+        padding: 20px;
+    }
+
+    .title {
+        margin-bottom: 45px;
+    }
+
+    .countdown {
+        gap: 8px;
+    }
+
+    .unit {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .number {
+        font-size: clamp(38px, 10vw, 80px);
+    }
+
+    .separator {
+        font-size: clamp(25px, 5vw, 50px);
+    }
+
+    .label {
+        margin-top: 20px;
+        font-size: 7px;
+        letter-spacing: 0.25em;
+    }
+
+    .date {
+        margin-top: 55px;
+        font-size: 8px;
+    }
+}
+
+@media (max-width: 520px) {
+
+    .title {
+        font-size: 8px;
+        letter-spacing: 0.3em;
+    }
+
+    .number {
+        font-size: 31px;
+    }
+
+    .separator {
+        font-size: 20px;
+    }
+
+    .label {
+        font-size: 6px;
+    }
+
+    .date {
+        font-size: 7px;
+    }
+
+    .sound {
+        right: 15px;
+        bottom: 15px;
+        padding: 9px 11px;
+        font-size: 7px;
+    }
+}
+
+</style>
 </head>
-
 
 <body>
 
+<div class="container">
 
-    <!-- FILMOVÝ GRAIN -->
+    <div class="title">
+        The countdown begins
+    </div>
 
-    <div class="grain"></div>
+    <div class="countdown">
 
-
-    <!-- =========================================
-         HLAVNÍ OBSAH
-         ========================================= -->
-
-    <main class="container">
-
-
-        <div class="title">
-
-            The countdown begins
-
+        <div class="unit">
+            <div class="number" id="months">00</div>
+            <div class="label">Months</div>
         </div>
 
-
-        <div class="countdown">
-
-
-            <!-- MĚSÍCE -->
-
-            <div class="unit">
-
-                <div
-                    class="number"
-                    id="months">
-
-                    00
-
-                </div>
-
-                <div class="label">
-
-                    Months
-
-                </div>
-
-            </div>
-
-
-            <div class="separator">
-
-                :
-
-            </div>
-
-
-            <!-- DNY -->
-
-            <div class="unit">
-
-                <div
-                    class="number"
-                    id="days">
-
-                    00
-
-                </div>
-
-                <div class="label">
-
-                    Days
-
-                </div>
-
-            </div>
-
-
-            <div class="separator">
-
-                :
-
-            </div>
-
-
-            <!-- HODINY -->
-
-            <div class="unit">
-
-                <div
-                    class="number"
-                    id="hours">
-
-                    00
-
-                </div>
-
-                <div class="label">
-
-                    Hours
-
-                </div>
-
-            </div>
-
-
-            <div class="separator">
-
-                :
-
-            </div>
-
-
-            <!-- MINUTY -->
-
-            <div class="unit">
-
-                <div
-                    class="number"
-                    id="minutes">
-
-                    00
-
-                </div>
-
-                <div class="label">
-
-                    Minutes
-
-                </div>
-
-            </div>
-
-
-            <div class="separator">
-
-                :
-
-            </div>
-
-
-            <!-- SEKUNDY -->
-
-            <div class="unit">
-
-                <div
-                    class="number"
-                    id="seconds">
-
-                    00
-
-                </div>
-
-                <div class="label">
-
-                    Seconds
-
-                </div>
-
-            </div>
-
-
+        <div class="separator">:</div>
+
+        <div class="unit">
+            <div class="number" id="days">00</div>
+            <div class="label">Days</div>
         </div>
 
+        <div class="separator">:</div>
 
-        <!-- DATUM -->
-
-        <div class="date">
-
-            15 · 08 · 2027
-
+        <div class="unit">
+            <div class="number" id="hours">00</div>
+            <div class="label">Hours</div>
         </div>
 
+        <div class="separator">:</div>
 
-    </main>
+        <div class="unit">
+            <div class="number" id="minutes">00</div>
+            <div class="label">Minutes</div>
+        </div>
 
+        <div class="separator">:</div>
 
-    <!-- =========================================
-         SOUND BUTTON
-         ========================================= -->
+        <div class="unit">
+            <div class="number" id="seconds">00</div>
+            <div class="label">Seconds</div>
+        </div>
 
-    <button
-        id="soundButton"
-        title="Zapnout / vypnout zvuk">
+    </div>
 
-        🔇
+    <div class="date">
+        15 · 08 · 2027
+    </div>
 
-    </button>
+</div>
 
+<button class="sound" id="soundButton">
+    Sound off
+</button>
 
-    <script>
 
+<!--
+    Skutečná nahrávka mechanického hodinového tikání.
+    Zdroj: Wikimedia Commons
+    Public domain
+-->
+<audio
+    id="clockSound"
+    preload="auto"
+    crossorigin="anonymous"
+    src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Clock_ticking.ogg">
+</audio>
 
-        /* =========================================
-           CÍLOVÉ DATUM
-           ========================================= */
 
-        const targetDate =
+<script>
 
-            new Date(
-                "2027-08-15T00:00:00"
-            );
+/* =========================================
+   NASTAVENÍ
+========================================= */
 
+const targetDate = new Date("2027-08-15T00:00:00");
 
-        /* =========================================
-           ELEMENTY
-           ========================================= */
 
-        const monthsElement =
-            document.getElementById("months");
+/* =========================================
+   ELEMENTY
+========================================= */
 
-        const daysElement =
-            document.getElementById("days");
+const monthsEl = document.getElementById("months");
+const daysEl = document.getElementById("days");
+const hoursEl = document.getElementById("hours");
+const minutesEl = document.getElementById("minutes");
+const secondsEl = document.getElementById("seconds");
 
-        const hoursElement =
-            document.getElementById("hours");
+const soundButton = document.getElementById("soundButton");
+const clockSound = document.getElementById("clockSound");
 
-        const minutesElement =
-            document.getElementById("minutes");
 
-        const secondsElement =
-            document.getElementById("seconds");
+/* =========================================
+   ZVUK
+========================================= */
 
-        const soundButton =
-            document.getElementById("soundButton");
+let soundEnabled = false;
 
+let audioContext = null;
+let audioSource = null;
+let audioGain = null;
 
-        /* =========================================
-           AUDIO
-           ========================================= */
 
-        let soundEnabled = false;
+/*
+    Vytvoření Web Audio systému.
 
-        let audioContext = null;
+    Díky tomu můžeme u velkých změn
+    udělat tiknutí hlubší a hlasitější.
+*/
 
+function setupAudio() {
 
-        function createAudio() {
+    if (audioContext) return;
 
-            if (!audioContext) {
+    audioContext = new (
+        window.AudioContext ||
+        window.webkitAudioContext
+    )();
 
-                audioContext = new (
+    audioSource = audioContext.createMediaElementSource(clockSound);
 
-                    window.AudioContext ||
-                    window.webkitAudioContext
+    audioGain = audioContext.createGain();
 
-                )();
+    audioGain.gain.value = 0;
 
-            }
+    audioSource.connect(audioGain);
+    audioGain.connect(audioContext.destination);
+}
 
 
-            if (
-                audioContext.state ===
-                "suspended"
-            ) {
+/*
+    Zapnutí / vypnutí zvuku
+*/
 
-                audioContext.resume();
+soundButton.addEventListener("click", async () => {
 
-            }
+    setupAudio();
 
-        }
+    if (audioContext.state === "suspended") {
+        await audioContext.resume();
+    }
 
+    soundEnabled = !soundEnabled;
 
-        /* =========================================
-           MECHANICKÉ TIKNUTÍ
-           =========================================
+    if (soundEnabled) {
 
-           Toto je hlavní zvuk.
+        soundButton.textContent = "Sound on";
+        soundButton.classList.add("active");
 
-           Není to elektronické pípnutí.
+        audioGain.gain.value = 0.55;
 
-           Používá krátký impulz,
-           který připomíná úder
-           mechanismu mechanických hodin.
+    } else {
 
-        ========================================= */
+        soundButton.textContent = "Sound off";
+        soundButton.classList.remove("active");
 
+        audioGain.gain.value = 0;
+    }
+});
 
-        function clockTick(
-            strength,
-            pitch,
-            length
-        ) {
 
+/*
+    Skutečné mechanické tiknutí.
 
-            if (!soundEnabled)
-                return;
+    Čím větší jednotka se změnila,
+    tím je zvuk hlubší a hlasitější.
+*/
 
+function mechanicalTick(type) {
 
-            createAudio();
+    if (!soundEnabled) return;
 
+    setupAudio();
 
-            const ctx =
-                audioContext;
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
 
+    /*
+        Každý typ změny má vlastní charakter.
+    */
 
-            const now =
-                ctx.currentTime;
+    let volume = 0.55;
+    let speed = 1;
 
+    if (type === "seconds") {
 
-            /* -------------------------------------
-               HLAVNÍ ÚDER
-               ------------------------------------- */
+        volume = 0.42;
+        speed = 1.00;
 
-            const oscillator =
-                ctx.createOscillator();
+    } else if (type === "minutes") {
 
+        volume = 0.58;
+        speed = 0.92;
 
-            const gain =
-                ctx.createGain();
+    } else if (type === "hours") {
 
+        volume = 0.72;
+        speed = 0.84;
 
-            oscillator.type =
-                "triangle";
+    } else if (type === "days") {
 
+        volume = 0.86;
+        speed = 0.76;
 
-            oscillator.frequency.setValueAtTime(
-                pitch,
-                now
-            );
+    } else if (type === "months") {
 
+        volume = 1.00;
+        speed = 0.67;
+    }
 
-            /*
-             * Velmi rychlý náběh
-             * vytvoří charakteristický
-             * mechanický úder.
-             */
+    /*
+        Krátké ztlumení před každým tiknutím,
+        aby se zvuky nepřekrývaly.
+    */
 
-            gain.gain.setValueAtTime(
-                0.0001,
-                now
-            );
+    audioGain.gain.cancelScheduledValues(audioContext.currentTime);
 
+    audioGain.gain.setValueAtTime(
+        0,
+        audioContext.currentTime
+    );
 
-            gain.gain.exponentialRampToValueAtTime(
-                strength,
-                now + 0.002
-            );
+    audioGain.gain.linearRampToValueAtTime(
+        volume,
+        audioContext.currentTime + 0.015
+    );
 
+    audioGain.gain.linearRampToValueAtTime(
+        0,
+        audioContext.currentTime + 0.42
+    );
 
-            gain.gain.exponentialRampToValueAtTime(
-                0.0001,
-                now + length
-            );
+    /*
+        Použijeme vždy začátek skutečné
+        nahrávky mechanických hodin.
+    */
 
+    clockSound.pause();
 
-            oscillator.connect(gain);
+    try {
+        clockSound.currentTime = 0;
+    } catch (e) {}
 
+    clockSound.playbackRate = speed;
 
-            gain.connect(
-                ctx.destination
-            );
+    clockSound.play().catch(() => {});
+}
 
 
-            oscillator.start(now);
+/* =========================================
+   ANIMACE ČÍSEL
+========================================= */
 
+function animateNumber(element, value) {
 
-            oscillator.stop(
-                now + length
-            );
+    const newValue = String(value).padStart(2, "0");
 
+    if (element.textContent === newValue) {
+        return false;
+    }
 
-            /* -------------------------------------
-               VELMI KRÁTKÉ "CVAKNUTÍ"
-               ------------------------------------- */
+    element.classList.add("changed");
 
-            const click =
-                ctx.createOscillator();
+    setTimeout(() => {
 
+        element.textContent = newValue;
 
-            const clickGain =
-                ctx.createGain();
+        element.classList.remove("changed");
 
+    }, 90);
 
-            click.type =
-                "square";
+    return true;
+}
 
 
-            click.frequency.setValueAtTime(
-                pitch * 2.2,
-                now
-            );
+/* =========================================
+   VÝPOČET MĚSÍCŮ
+========================================= */
 
+function getDifference(now, target) {
 
-            clickGain.gain.setValueAtTime(
-                strength * 0.35,
-                now
-            );
+    let months = 0;
 
+    let tempDate = new Date(now);
 
-            clickGain.gain.exponentialRampToValueAtTime(
-                0.0001,
-                now + 0.018
-            );
+    /*
+        Přidáváme celé měsíce,
+        dokud se nedostaneme před cílové datum.
+    */
 
+    while (true) {
 
-            click.connect(
-                clickGain
-            );
+        let nextDate = new Date(tempDate);
 
-
-            clickGain.connect(
-                ctx.destination
-            );
-
-
-            click.start(now);
-
-
-            click.stop(
-                now + 0.02
-            );
-
-        }
-
-
-        /* =========================================
-           SEKUNDA
-           ========================================= */
-
-        function secondTick() {
-
-            clockTick(
-
-                0.055,
-
-                1250,
-
-                0.055
-
-            );
-
-        }
-
-
-        /* =========================================
-           MINUTA
-           ========================================= */
-
-        function minuteTick() {
-
-            clockTick(
-
-                0.11,
-
-                850,
-
-                0.075
-
-            );
-
-        }
-
-
-        /* =========================================
-           HODINA
-           ========================================= */
-
-        function hourTick() {
-
-            clockTick(
-
-                0.17,
-
-                620,
-
-                0.10
-
-            );
-
-        }
-
-
-        /* =========================================
-           DEN
-           ========================================= */
-
-        function dayTick() {
-
-            clockTick(
-
-                0.25,
-
-                430,
-
-                0.15
-
-            );
-
-        }
-
-
-        /* =========================================
-           MĚSÍC
-           ========================================= */
-
-        function monthTick() {
-
-            clockTick(
-
-                0.36,
-
-                300,
-
-                0.22
-
-            );
-
-        }
-
-
-        /* =========================================
-           ZAPNUTÍ ZVUKU
-           ========================================= */
-
-        soundButton.addEventListener(
-            "click",
-            function() {
-
-
-                soundEnabled =
-                    !soundEnabled;
-
-
-                if (soundEnabled) {
-
-
-                    createAudio();
-
-
-                    soundButton.textContent =
-                        "🔊";
-
-
-                    /*
-                     * Testovací mechanické tiknutí
-                     */
-
-                    clockTick(
-                        0.11,
-                        850,
-                        0.075
-                    );
-
-
-                } else {
-
-
-                    soundButton.textContent =
-                        "🔇";
-
-                }
-
-            }
+        nextDate.setMonth(
+            nextDate.getMonth() + 1
         );
 
+        if (nextDate <= target) {
 
-        /* =========================================
-           DOPLNĚNÍ NULY
-           ========================================= */
+            tempDate = nextDate;
+            months++;
 
-        function twoDigits(number) {
+        } else {
 
-            return String(number)
-                .padStart(2, "0");
-
+            break;
         }
+    }
 
 
-        /* =========================================
-           ANIMACE
-           ========================================= */
+    /*
+        Zbytek převedeme na dny,
+        hodiny, minuty a sekundy.
+    */
 
-        function animate(element) {
+    let remaining =
+        target.getTime() -
+        tempDate.getTime();
 
 
-            element.classList.remove(
-                "change"
-            );
+    const dayMs =
+        1000 * 60 * 60 * 24;
 
+    const hourMs =
+        1000 * 60 * 60;
 
-            void element.offsetWidth;
+    const minuteMs =
+        1000 * 60;
 
+    const secondMs =
+        1000;
 
-            element.classList.add(
-                "change"
-            );
 
-        }
+    const days =
+        Math.floor(remaining / dayMs);
 
+    remaining -= days * dayMs;
 
-        /* =========================================
-           PŘEDCHOZÍ HODNOTY
-           ========================================= */
 
-        let previous = {
+    const hours =
+        Math.floor(remaining / hourMs);
 
-            months: null,
+    remaining -= hours * hourMs;
 
-            days: null,
 
-            hours: null,
+    const minutes =
+        Math.floor(remaining / minuteMs);
 
-            minutes: null,
+    remaining -= minutes * minuteMs;
 
-            seconds: null
 
-        };
+    const seconds =
+        Math.floor(remaining / secondMs);
 
 
-        /* =========================================
-           COUNTDOWN
-           ========================================= */
+    return {
+        months,
+        days,
+        hours,
+        minutes,
+        seconds
+    };
+}
 
-        function updateCountdown() {
 
+/* =========================================
+   POSLEDNÍ HODNOTY
+========================================= */
 
-            const now =
-                new Date();
+let previous = {
+    months: null,
+    days: null,
+    hours: null,
+    minutes: null,
+    seconds: null
+};
 
 
-            let difference =
-                targetDate - now;
+/* =========================================
+   HLAVNÍ COUNTDOWN
+========================================= */
 
+function updateCountdown() {
 
-            /* -------------------------------------
-               KONEC ODPOČTU
-               ------------------------------------- */
+    const now = new Date();
 
-            if (difference <= 0) {
+    /*
+        Pokud už countdown skončil
+    */
 
+    if (now >= targetDate) {
 
-                monthsElement.textContent =
-                    "00";
+        monthsEl.textContent = "00";
+        daysEl.textContent = "00";
+        hoursEl.textContent = "00";
+        minutesEl.textContent = "00";
+        secondsEl.textContent = "00";
 
-                daysElement.textContent =
-                    "00";
+        return;
+    }
 
-                hoursElement.textContent =
-                    "00";
 
-                minutesElement.textContent =
-                    "00";
+    const time =
+        getDifference(now, targetDate);
 
-                secondsElement.textContent =
-                    "00";
 
-
-                return;
-
-            }
-
-
-            /* -------------------------------------
-               MĚSÍCE
-               ------------------------------------- */
-
-            let months = 0;
-
-
-            let tempDate =
-                new Date(now);
-
-
-            while (true) {
-
-
-                const nextMonth =
-                    new Date(tempDate);
-
-
-                nextMonth.setMonth(
-                    nextMonth.getMonth() + 1
-                );
-
-
-                if (
-                    nextMonth <= targetDate
-                ) {
-
-
-                    months++;
-
-
-                    tempDate =
-                        nextMonth;
-
-
-                } else {
-
-
-                    break;
-
-                }
-
-            }
-
-
-            /* -------------------------------------
-               ZBYTEK
-               ------------------------------------- */
-
-            let remaining =
-                targetDate - tempDate;
-
-
-            const days =
-                Math.floor(
-
-                    remaining /
-                    (
-                        1000 *
-                        60 *
-                        60 *
-                        24
-                    )
-
-                );
-
-
-            remaining -=
-
-                days *
-                (
-                    1000 *
-                    60 *
-                    60 *
-                    24
-                );
-
-
-            const hours =
-                Math.floor(
-
-                    remaining /
-                    (
-                        1000 *
-                        60 *
-                        60
-                    )
-
-                );
-
-
-            remaining -=
-
-                hours *
-                (
-                    1000 *
-                    60 *
-                    60
-                );
-
-
-            const minutes =
-                Math.floor(
-
-                    remaining /
-                    (
-                        1000 *
-                        60
-                    )
-
-                );
-
-
-            remaining -=
-
-                minutes *
-                (
-                    1000 *
-                    60
-                );
-
-
-            const seconds =
-                Math.floor(
-
-                    remaining /
-                    1000
-
-                );
-
-
-            /* -------------------------------------
-               HODNOTY
-               ------------------------------------- */
-
-            const values = {
-
-
-                months:
-                    twoDigits(months),
-
-
-                days:
-                    twoDigits(days),
-
-
-                hours:
-                    twoDigits(hours),
-
-
-                minutes:
-                    twoDigits(minutes),
-
-
-                seconds:
-                    twoDigits(seconds)
-
-            };
-
-
-            /* -------------------------------------
-               ZOBRAZENÍ
-               ------------------------------------- */
-
-            monthsElement.textContent =
-                values.months;
-
-
-            daysElement.textContent =
-                values.days;
-
-
-            hoursElement.textContent =
-                values.hours;
-
-
-            minutesElement.textContent =
-                values.minutes;
-
-
-            secondsElement.textContent =
-                values.seconds;
-
-
-            /* -------------------------------------
-               SEKUNDA
-               ------------------------------------- */
-
-            if (
-
-                previous.seconds !== null &&
-
-                previous.seconds !==
-                values.seconds
-
-            ) {
-
-
-                animate(
-                    secondsElement
-                );
-
-
-                secondTick();
-
-            }
-
-
-            /* -------------------------------------
-               MINUTA
-               ------------------------------------- */
-
-            if (
-
-                previous.minutes !== null &&
-
-                previous.minutes !==
-                values.minutes
-
-            ) {
-
-
-                animate(
-                    minutesElement
-                );
-
-
-                minuteTick();
-
-            }
-
-
-            /* -------------------------------------
-               HODINA
-               ------------------------------------- */
-
-            if (
-
-                previous.hours !== null &&
-
-                previous.hours !==
-                values.hours
-
-            ) {
-
-
-                animate(
-                    hoursElement
-                );
-
-
-                hourTick();
-
-            }
-
-
-            /* -------------------------------------
-               DEN
-               ------------------------------------- */
-
-            if (
-
-                previous.days !== null &&
-
-                previous.days !==
-                values.days
-
-            ) {
-
-
-                animate(
-                    daysElement
-                );
-
-
-                dayTick();
-
-            }
-
-
-            /* -------------------------------------
-               MĚSÍC
-               ------------------------------------- */
-
-            if (
-
-                previous.months !== null &&
-
-                previous.months !==
-                values.months
-
-            ) {
-
-
-                animate(
-                    monthsElement
-                );
-
-
-                monthTick();
-
-            }
-
-
-            /* -------------------------------------
-               ULOŽENÍ
-               ------------------------------------- */
-
-            previous =
-                values;
-
-        }
-
-
-        /* =========================================
-           SPUŠTĚNÍ
-           ========================================= */
-
-        updateCountdown();
-
-
-        setInterval(
-
-            updateCountdown,
-
-            250
-
+    /*
+        Změna měsíců
+    */
+
+    if (
+        previous.months !== null &&
+        previous.months !== time.months
+    ) {
+
+        animateNumber(
+            monthsEl,
+            time.months
         );
 
-    </script>
+        mechanicalTick("months");
 
+    } else {
+
+        monthsEl.textContent =
+            String(time.months).padStart(2, "0");
+    }
+
+
+    /*
+        Změna dnů
+    */
+
+    if (
+        previous.days !== null &&
+        previous.days !== time.days
+    ) {
+
+        animateNumber(
+            daysEl,
+            time.days
+        );
+
+        mechanicalTick("days");
+
+    } else {
+
+        daysEl.textContent =
+            String(time.days).padStart(2, "0");
+    }
+
+
+    /*
+        Změna hodin
+    */
+
+    if (
+        previous.hours !== null &&
+        previous.hours !== time.hours
+    ) {
+
+        animateNumber(
+            hoursEl,
+            time.hours
+        );
+
+        mechanicalTick("hours");
+
+    } else {
+
+        hoursEl.textContent =
+            String(time.hours).padStart(2, "0");
+    }
+
+
+    /*
+        Změna minut
+    */
+
+    if (
+        previous.minutes !== null &&
+        previous.minutes !== time.minutes
+    ) {
+
+        animateNumber(
+            minutesEl,
+            time.minutes
+        );
+
+        mechanicalTick("minutes");
+
+    } else {
+
+        minutesEl.textContent =
+            String(time.minutes).padStart(2, "0");
+    }
+
+
+    /*
+        Změna sekund
+
+        Normálně tikne každou sekundu.
+    */
+
+    if (
+        previous.seconds !== null &&
+        previous.seconds !== time.seconds
+    ) {
+
+        animateNumber(
+            secondsEl,
+            time.seconds
+        );
+
+        mechanicalTick("seconds");
+
+    } else {
+
+        secondsEl.textContent =
+            String(time.seconds).padStart(2, "0");
+    }
+
+
+    /*
+        Uložení současných hodnot
+    */
+
+    previous = {
+        months: time.months,
+        days: time.days,
+        hours: time.hours,
+        minutes: time.minutes,
+        seconds: time.seconds
+    };
+}
+
+
+/* =========================================
+   SPUŠTĚNÍ
+========================================= */
+
+updateCountdown();
+
+setInterval(
+    updateCountdown,
+    250
+);
+
+</script>
 
 </body>
-
 </html>
